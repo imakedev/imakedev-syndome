@@ -1,0 +1,18 @@
+<project>
+
+ 
+	<target name="jar_pst_dto">
+		<jar destfile="../target/PSTShare.jar">
+			<!-- MISSExamServices/build/classes -->
+			<!-- common -->			  
+			<fileset dir="../build/classes" includes="th/co/aoe/imake/pst/constant/*.class" />
+			<!-- 
+			<fileset dir="../build/classes" includes="th/co/vlink/criteria/*.class" />
+			<fileset dir="../build/classes" includes="th/co/vlink/utils/*.class" />
+			<fileset dir="../build/classes" includes="th/co/vlink/utils/properties/*.class" />
+			-->
+			<fileset dir="../build/classes" includes="th/co/aoe/imake/pst/xstream/*.class" />
+			<fileset dir="../build/classes" includes="th/co/aoe/imake/pst/xstream/common/*.class" />			 
+		</jar>
+	</target> 
+</project>
