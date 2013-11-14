@@ -1,0 +1,49 @@
+<html>
+<head>
+	<title>
+	FusionCharts Server-side Export Sample Using JavaScript
+	</title>
+	<script language="JavaScript" src="../../FusionCharts/FusionCharts.js"></script> 
+<!-- 	<script language="JavaScript" src="../../newVersion/Charts/FusionCharts.js"></script> -->
+	<script type="text/javascript">
+	function startExport(){
+		//Get reference to chart.
+		var chart = getChartFromId("myChartId");
+		//Now, we proceed with exporting only if chart has finished rendering.
+		if (chart.hasRendered()==true){
+			chart.exportChart();
+		}else{
+			alert("Please wait for the chart to finish rendering, before you can invoke exporting");
+		}
+	}
+	</script>
+</head>
+
+<body bgcolor="#ffffff">
+  
+      <!--   <div id="chartdiv" align="center">Chart will load here</div>
+        <script type="text/javascript">
+            if (GALLERY_RENDERER && GALLERY_RENDERER.search(/javascript|flash/i)==0)  FusionCharts.setCurrentRenderer(GALLERY_RENDERER); 
+            var chart = new FusionCharts("../../Charts/Bar2D.swf", "ChartId", "560", "400", "0", "0");
+		   chart.setXMLData( dataString );		   
+		   chart.render("chartdiv");
+		</script>
+		 -->
+
+<div id="chartdiv" align="center">The chart will appear within this DIV. This text will be replaced by the chart.</div>
+   <script type="text/javascript">
+   	//Create the chart.
+    
+	 // FusionCharts.setCurrentRenderer('javascript'); // for new version
+    // var myChart = new FusionCharts("../../newVersion/Charts/Column2D.swf", "myChartId", "400", "300", "0", "1"); //for new version
+     
+     var myChart = new FusionCharts("../../FusionCharts/Column2D.swf", "myChartId", "600", "300", "0", "1"); // for old version
+	myChart.setDataURL("ServerSideSimple.xml");
+	myChart.render("chartdiv");
+   </script>
+
+<BR/>
+<center><input type='button' value='Begin Chart Export' onClick="javascript:startExport();">
+
+</body>
+</html>
