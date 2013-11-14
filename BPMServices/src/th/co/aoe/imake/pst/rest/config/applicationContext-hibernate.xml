@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	Application context definition for Quiz on Hibernate.
+--> 		
+			<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:p="http://www.springframework.org/schema/p"
+		xmlns:context="http://www.springframework.org/schema/context" 
+		xmlns:jdbc="http://www.springframework.org/schema/jdbc" 
+		xmlns:jee="http://www.springframework.org/schema/jee" 
+		xmlns:tx="http://www.springframework.org/schema/tx"
+		xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+			http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd
+			http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.1.xsd 
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+			
+			<!-- 
+			<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+		xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+		xsi:schemaLocation="
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+			 -->
+<!-- 
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+		xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+			http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.1.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+			 -->
+		
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+
+	<!-- Configurer that replaces ${...} placeholders with values from a properties file -->
+	<!-- (in this case, JDBC-related settings for the dataSource definition below) -->
+	<context:property-placeholder location="classpath:jdbc.properties"/>
+
+	<!--
+		Uses Apache Commons DBCP for connection pooling. See Commons DBCP documentation
+		for the required JAR files. Alternatively you can use another connection pool
+		such as C3P0, similarly configured using Spring.
+	-->
+	<!--  -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
+			p:driverClassName="${jdbc.driverClassName}" p:url="${jdbc.url}" p:username="${jdbc.username}"
+			p:password="${jdbc.password}"/>
+		 	 
+	<!-- 
+	     
+     <jee:jndi-lookup id="dataSource" resource-ref="true" jndi-name="jdbc/pstdb"/>
+        --> 
+	<!-- JNDI DataSource for JEE environments -->
+       <!--
+         
+		<jee:jndi-lookup id="dataSource" jndi-name="java:/comp/env/jdbc/officeDS" resource-ref="true"/>
+    	
+		 
+		<jee:jndi-lookup id="dataSource" jndi-name="jdbc/localOracle"/>
+	
+	     -->
+	     <!-- 
+	 <jee:jndi-lookup id="dataSource" resource-ref="true" jndi-name="jdbc/appdb"/>
+	 -->
+	 
+	 <!-- 
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean"
+	 -->
+	 <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
+	p:dataSource-ref="dataSource" >
+  		 <property name="dataSource" ref="dataSource"/>
+  		 <property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.generate_statistics">${hibernate.generate_statistics}</prop>		
+				<prop key="hibernate.connection.autocommit">false</prop>
+				<!-- 
+				<prop key="hibernate.hbm2ddl.auto">create</prop>
+				 --> 
+			</props>	
+		</property>
+  		 <!-- 
+  		 <property name="annotatedPackages">
+     		<list>
+       			<value>test.package</value>
+     		</list>
+   		</property>
+   		 -->
+   		 <property name="annotatedClasses">
+     		<list>
+     		<!--  
+			 -->
+			 <!-- <value>th.co.aoe.imake.pst.hibernate.bean.MissAccount</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissAccountSeriesMap</value>
+ 			 <value>th.co.aoe.imake.pst.hibernate.bean.MissCandidate</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissChoice</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissEvaluationTemplate</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissExam</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissExamGroup</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissExamType</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissQuestion</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissSeriesMap</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissSery</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissSurveySend</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissTemplate</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissTest</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissTestResult</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissTodo</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissAttach</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissContact</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissManual</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissSeriesAttach</value>
+				
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissEvaluationCalcuation</value>
+ 			 <value>th.co.aoe.imake.pst.hibernate.bean.MissEvaluationCode</value>
+ 			 <value>th.co.aoe.imake.pst.hibernate.bean.MissEvaluationMessage</value>
+ 			 <value>th.co.aoe.imake.pst.hibernate.bean.MissEvaluationTemplate</value> -->
+ 			 
+ 			 <value>th.co.aoe.imake.pst.hibernate.bean.RoleContact</value>
+ 			 <value>th.co.aoe.imake.pst.hibernate.bean.RoleMapping</value>
+ 			 <value>th.co.aoe.imake.pst.hibernate.bean.RoleType</value>
+ 			 <value>th.co.aoe.imake.pst.hibernate.bean.UserContact</value> 			
+ 			 <value>th.co.aoe.imake.pst.hibernate.bean.User</value>
+ 			 <value>th.co.aoe.imake.pst.hibernate.bean.Role</value>
+ 			 
+ 			 <value>th.co.aoe.imake.pst.hibernate.bean.PstBrand</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstBreakDown</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstCheckingMapping</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstConcrete</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstCost</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstDepartment</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstEmployee</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstEmployeeStatus</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstEmployeeWorkMapping</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstJob</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstJobEmployee</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstJobPay</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstJobPayExt</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstJobWork</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstMaintenance</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstModel</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstPosition</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstRoadPump</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstRoadPumpDeactiveMapping</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstRoadPumpStatus</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstRoadPumpType</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstTitle</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstWorkType</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstMaintenanceTran</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstCustomer</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstCustomerContact</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.PstCustomerDivision</value>
+			 
+ 			<!--  <value>th.co.aoe.imake.pst.hibernate.bean.MissEvaluationConfig</value>
+ 			 <value>th.co.aoe.imake.pst.hibernate.bean.MissTestShow</value>
+ 			 <value>th.co.aoe.imake.pst.hibernate.bean.MissTheme</value>  
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissCareerMaster</value> 
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissIndustryMaster</value>  
+			 
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissAccountGroup</value> 
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissAccountMapping</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissReactiveLog</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissSeryOrder</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissSeryProblem</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissSeryUse</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissSystemUse</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissSaleMap</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissDataChart</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissEptEvalBehavioralValue</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissEptPlusWorkWheelMessage</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissEptDominance</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissEptAttitudeDetectorReport</value> 
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissEptTraitsDetector</value>
+			 <value>th.co.aoe.imake.pst.hibernate.bean.MissDoc</value> -->  
+			 
+			 <!-- Test -->
+			<!--  <value>th.co.aoe.imake.pst.hibernate.bean.Xls</value>   -->
+			</list>
+   		</property>
+   		<!-- 
+   		 <property name="packagesToScan" value="com.example.domain" />
+   		 -->
+   		<!-- <property name="eventListeners">
+			<map>
+				<entry key="merge">
+					<bean class="org.springframework.orm.hibernate3.support.IdTransferringMergeEventListener"/>
+				</entry>
+			</map>
+		</property>  -->
+ 	</bean> 	 
+	<!-- Hibernate SessionFactory -->
+	<!-- 
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean"
+			p:dataSource-ref="dataSource"> 
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.generate_statistics">${hibernate.generate_statistics}</prop>				
+			</props>	
+		</property>
+		
+		<property name="mappingResources">
+			<list>
+			 
+			</list>
+		</property>
+		 
+		<property name="eventListeners">
+			<map>
+				<entry key="merge">
+					<bean class="org.springframework.orm.hibernate3.support.IdTransferringMergeEventListener"/>
+				</entry>
+			</map>
+		</property> 
+	</bean>
+-->
+	<!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA) -->
+	<!--  
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager"
+			p:sessionFactory-ref="sessionFactory"/>
+		-->	
+		<!-- 
+	 <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager"
+			p:sessionFactory-ref="sessionFactory"/>
+			 -->
+	  
+ 	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager"
+ 		p:sessionFactory-ref="sessionFactory"/>
+ 	 
+	<!-- Transaction manager that delegates to JTA (for a transactional JNDI DataSource) -->
+	 <!-- 
+	<bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager"/>
+  -->
+  <!-- 
+	 <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager"
+	 p:sessionFactory-ref="sessionFactory"/>
+	  -->
+	<!--
+	<bean id="wsJtaTm" class="org.springframework.transaction.jta.WebSphereTransactionManagerFactoryBean"/>
+ <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+ <property name="transactionManager ref="wsJtaTm"/>
+ </bean>
+ <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager"/>
+ -->
+	
+
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->
+
+	<!--
+		Activates various annotations to be detected in bean classes:
+		Spring's @Required and @Autowired, as well as JSR 250's @Resource.
+	-->
+	<context:annotation-config/>
+
+	<!--
+		Instruct Spring to perform declarative transaction management
+		automatically on annotated classes.
+	-->
+	  <!-- 
+	<tx:annotation-driven/>
+	  -->
+	<!--  -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	
+	<!--
+		Exporter that exposes the Hibernate statistics service via JMX. Autodetects the
+		service MBean, using its bean name as JMX object name.
+	-->
+	<context:mbean-export/> 
+ 	 
+ 	<bean id="pstCommonService" class="th.co.aoe.imake.pst.hibernate.HibernatePSTCommon">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	
+	<!-- BreakDown -->
+	<bean id="pstBreakDownService" class="th.co.aoe.imake.pst.hibernate.HibernatePstBreakDown">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	
+	<!-- Cost -->
+	<bean id="pstCostService" class="th.co.aoe.imake.pst.hibernate.HibernatePstCost">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	
+	<!-- RoadPump -->
+	<bean id="pstRoadPumpService" class="th.co.aoe.imake.pst.hibernate.HibernatePstRoadPump">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	<bean id="pstRoadPumpStatusService" class="th.co.aoe.imake.pst.hibernate.HibernatePstRoadPumpStatus">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	<bean id="pstRoadPumpTypeService" class="th.co.aoe.imake.pst.hibernate.HibernatePstRoadPumpType">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	
+	<bean id="pstRoadPumpDeactiveMappingService" class="th.co.aoe.imake.pst.hibernate.HibernatePstRoadPumpDeactiveMapping">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	
+	<!-- Employee -->
+	<bean id="pstEmployeeService" class="th.co.aoe.imake.pst.hibernate.HibernatePstEmployee">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	<bean id="pstEmployeeStatusService" class="th.co.aoe.imake.pst.hibernate.HibernatePstEmployeeStatus">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	<bean id="pstEmployeeWorkMappingService" class="th.co.aoe.imake.pst.hibernate.HibernatePstEmployeeWorkMapping">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	
+	<bean id="pstPositionService" class="th.co.aoe.imake.pst.hibernate.HibernatePstPosition">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	<bean id="pstModelService" class="th.co.aoe.imake.pst.hibernate.HibernatePstModel">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	<bean id="pstBrandService" class="th.co.aoe.imake.pst.hibernate.HibernatePstBrand">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	<bean id="userService" class="th.co.aoe.imake.pst.hibernate.HibernateUser">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	<bean id="pstDepartmentService" class="th.co.aoe.imake.pst.hibernate.HibernatePstDepartment">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	<bean id="pstWorkTypeService" class="th.co.aoe.imake.pst.hibernate.HibernatePstWorkType">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	<bean id="pstTitleService" class="th.co.aoe.imake.pst.hibernate.HibernatePstTitle">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	<bean id="pstConcreteService" class="th.co.aoe.imake.pst.hibernate.HibernatePstConcrete">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	<bean id="pstJobService" class="th.co.aoe.imake.pst.hibernate.HibernatePstJob">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	 
+	<bean id="pstJobWorkService" class="th.co.aoe.imake.pst.hibernate.HibernatePstJobWork">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	<bean id="pstJobEmployeeService" class="th.co.aoe.imake.pst.hibernate.HibernatePstJobEmployee">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	<bean id="pstJobPayService" class="th.co.aoe.imake.pst.hibernate.HibernatePstJobPay">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	<bean id="pstJobPayExtService" class="th.co.aoe.imake.pst.hibernate.HibernatePstJobPayExt">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	
+	<bean id="pstObjectService" class="th.co.aoe.imake.pst.hibernate.HibernatePstObject">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	
+	<bean id="pstCustomerService" class="th.co.aoe.imake.pst.hibernate.HibernatePstCustomer">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	
+	<bean id="pstCustomerContactService" class="th.co.aoe.imake.pst.hibernate.HibernatePstCustomerContact">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+	
+	<bean id="pstCustomerDivisionService" class="th.co.aoe.imake.pst.hibernate.HibernatePstCustomerDivision">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
+ 
+ 
+</beans>
