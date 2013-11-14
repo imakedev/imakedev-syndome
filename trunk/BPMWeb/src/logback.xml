@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!-- For assistance related to logback-translator or configuration  -->
+<!-- files in general, please contact the logback user mailing list -->
+<!-- at http://www.qos.ch/mailman/listinfo/logback-user             -->
+<!--                                                                -->
+<!-- For professional support please see                            -->
+<!--    http://www.qos.ch/shop/products/professionalSupport         -->
+<!--                                                                -->
+<configuration>
+  <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+     <!--  <pattern>%d %p [%c] - &lt;%m&gt;%n</pattern> -->
+     <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
+    </encoder>
+  </appender>
+  <appender name="pstAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
+    <File>/aoe/logs/PSTOffice2.log</File>
+    <encoder>
+      <!--   
+      <pattern>%d %-5p [%t] %-17c{2} (%13F:%L) %3x - %m%n</pattern>
+     
+      -->
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{5} [%file:%line] - %msg%n</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <minIndex>1</minIndex>
+      <maxIndex>3</maxIndex>
+      <FileNamePattern>/aoe/logs/PSTOffice2-%i.log</FileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>512KB</MaxFileSize>
+    </triggeringPolicy>
+  </appender>
+  <logger name="PSTLog" level="DEBUG">
+    <appender-ref ref="pstAppender"/>
+  </logger>
+  <root level="DEBUG">
+    <appender-ref ref="stdout"/> 
+   <!--  <appender-ref ref="pstAppender"/> -->
+  </root>
+</configuration>
