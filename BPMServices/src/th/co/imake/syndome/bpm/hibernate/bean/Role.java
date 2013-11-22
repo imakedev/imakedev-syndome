@@ -1,37 +1,52 @@
 package th.co.imake.syndome.bpm.hibernate.bean;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import java.io.Serializable;
+import javax.persistence.*;
 
+
+/**
+ * The persistent class for the role database table.
+ * 
+ */
 @Entity
-@Table(name="role",schema="PST_DB") 
-public class Role {
-	
+@Table(name="role",schema="SYNDOME_BPM_DB")
+public class Role implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	@Id
-	private Long id;
-	
-	@OneToOne
+	private String id;
+
+	private int role;
+
+	//bi-directional many-to-one association to User
+	@ManyToOne
 	private User user;
-	private Integer role;
-	
-	public Long getId() {
-		return id;
+
+	public Role() {
 	}
-	public void setId(Long id) {
+
+	public String getId() {
+		return this.id;
+	}
+
+	public void setId(String id) {
 		this.id = id;
 	}
-	public User getUser() {
-		return user;
+
+	public int getRole() {
+		return this.role;
 	}
+
+	public void setRole(int role) {
+		this.role = role;
+	}
+
+	public User getUser() {
+		return this.user;
+	}
+
 	public void setUser(User user) {
 		this.user = user;
 	}
-	public Integer getRole() {
-		return role;
-	}
-	public void setRole(Integer role) {
-		this.role = role;
-	}
+
 }

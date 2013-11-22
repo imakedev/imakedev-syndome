@@ -1,42 +1,64 @@
 package th.co.imake.syndome.bpm.hibernate.bean;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import java.io.Serializable;
+import javax.persistence.*;
+import java.util.List;
 
+
+/**
+ * The persistent class for the user database table.
+ * 
+ */
 @Entity
-@Table(name="user",schema="PST_DB")
-public class User {
-	
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private Long id;
-	
-	private String firstName;
-	private String lastName;
-	
-	@Column(unique=true)
-	private String username;
-	private String password;
-	
-	@OneToOne(mappedBy="user", cascade={CascadeType.ALL})
-	private Role role;
+@Table(name="user",schema="SYNDOME_BPM_DB")
+public class User implements Serializable {
+	private static final long serialVersionUID = 1L;
 
-	public Long getId() {
-		return id;
+	@Id
+	private String id;
+
+	private byte enabled;
+
+	private String firstName;
+
+	private String lastName;
+
+	private String password;
+
+	private String type;
+
+	private String username;
+
+	//bi-directional many-to-one association to Role
+	@OneToMany(mappedBy="user")
+	private List<Role> roles;
+
+	//bi-directional many-to-one association to BpmRole
+	@ManyToOne
+	@JoinColumn(name="BPM_ROLE_ID")
+	private BpmRole bpmRole;
+
+	public User() {
 	}
 
-	public void setId(Long id) {
+	public String getId() {
+		return this.id;
+	}
+
+	public void setId(String id) {
 		this.id = id;
 	}
 
+	public byte getEnabled() {
+		return this.enabled;
+	}
+
+	public void setEnabled(byte enabled) {
+		this.enabled = enabled;
+	}
+
 	public String getFirstName() {
-		return firstName;
+		return this.firstName;
 	}
 
 	public void setFirstName(String firstName) {
@@ -44,34 +66,65 @@ public class User {
 	}
 
 	public String getLastName() {
-		return lastName;
+		return this.lastName;
 	}
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
 
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
 	public String getPassword() {
-		return password;
+		return this.password;
 	}
 
 	public void setPassword(String password) {
 		this.password = password;
 	}
 
-	public Role getRole() {
+	public String getType() {
+		return this.type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getUsername() {
+		return this.username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public List<Role> getRoles() {
+		return this.roles;
+	}
+
+	public void setRoles(List<Role> roles) {
+		this.roles = roles;
+	}
+
+	public Role addRole(Role role) {
+		getRoles().add(role);
+		role.setUser(this);
+
 		return role;
 	}
 
-	public void setRole(Role role) {
-		this.role = role;
+	public Role removeRole(Role role) {
+		getRoles().remove(role);
+		role.setUser(null);
+
+		return role;
 	}
+
+	public BpmRole getBpmRole() {
+		return this.bpmRole;
+	}
+
+	public void setBpmRole(BpmRole bpmRole) {
+		this.bpmRole = bpmRole;
+	}
+
 }
