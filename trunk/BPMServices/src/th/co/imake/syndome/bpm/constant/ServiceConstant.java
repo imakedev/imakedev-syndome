@@ -251,6 +251,7 @@ public class ServiceConstant {
 		
 		public static final String PST_OBJECT_SEARCH = "searchObject";
 		public static final String PST_OBJECT_EXECUTE = "executeQuery";
+		public static final String PST_OBJECT_EXECUTE_WITH_VALUES = "executeQueryWithValues";
 		public static final String PST_OBJECT_UPDATE = "executeQueryUpdate";
 		public static final String PST_OBJECT_DELETE = "executeQueryDelete";
 		public static final String PST_OBJECT_EXECUTE_MAINTENANCE = "executeMaintenanceQuery";
