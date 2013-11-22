@@ -15,7 +15,7 @@ import javax.persistence.Table;
  * 
  */
 @Entity
-@Table(name="role_type",schema="PST_DB")
+@Table(name="role_type",schema="SYNDOME_BPM_DB")
 public class RoleType implements Serializable {
 	private static final long serialVersionUID = 1L;
 
