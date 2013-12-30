@@ -28,7 +28,6 @@
 package th.co.imake.syndome.bpm.rest.application;
 
 import org.restlet.Component;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -43,16 +42,17 @@ public class Main {
 //    public static void main(String... args) throws Exception {
 	public static void main(String[] args) throws Exception {
         // Load the Spring application context
-        final ApplicationContext springContext = new ClassPathXmlApplicationContext(
+        final ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext(
                 new String[] {
-                		 "th/co/aoe/imake/pst/rest/config/applicationContext-common.xml",
-                		 "th/co/aoe/imake/pst/rest/config/applicationContext-hibernate.xml",
-                		 "th/co/aoe/imake/pst/rest/config/applicationContext-pst-resource.xml",
-                		 "th/co/aoe/imake/pst/rest/config/applicationContext-root-router.xml",
-						"th/co/aoe/imake/pst/rest/config/applicationContext-server.xml"});  
+                		 "th/co/imake/syndome/bpm/rest/config/applicationContext-common.xml",
+                		 "th/co/imake/syndome/bpm/rest/config/applicationContext-hibernate.xml",
+                		 "th/co/imake/syndome/bpm/rest/config/applicationContext-syndome-bpm-resource.xml",
+                		 "th/co/imake/syndome/bpm/rest/config/applicationContext-root-router.xml",
+                		 "th/co/imake/syndome/bpm/rest/config/applicationContext-server.xml"});  
 
         // Obtain the Restlet component from the Spring context and start it
         ((Component) springContext.getBean("top")).start();
+        springContext.close();
 	/*	applicationContext-bps-resource.xml
         applicationContext-common.xml
         applicationContext-hibernate.xml
