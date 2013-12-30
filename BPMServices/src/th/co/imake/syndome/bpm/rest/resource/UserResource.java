@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
@@ -16,6 +17,9 @@ import th.co.imake.syndome.bpm.managers.PSTCommonService;
 import th.co.imake.syndome.bpm.managers.UserService;
 import th.co.imake.syndome.bpm.xstream.common.Pagging;
 import th.co.imake.syndome.bpm.xstream.common.VResultMessage;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 
 public class UserResource  extends BaseResource {
 
@@ -78,7 +82,7 @@ public class UserResource  extends BaseResource {
 							//java.sql.Timestamp timeStampStartDate = new java.sql.Timestamp(new Date().getTime());
 							Long id=0l;
 							id=(Long) (pstCommonService.save(bpsTerm));
-							xbpsTerm.setId(id);
+							//xbpsTerm.setId(id);
 							return returnUpdateRecord(entity,xbpsTerm,id.intValue());
 						} else if(serviceName.equals(ServiceConstant.USER_UPDATE)){
 							//java.sql.Timestamp timeStampStartDate = new java.sql.Timestamp(new Date().getTime());
@@ -131,6 +135,37 @@ public class UserResource  extends BaseResource {
 		}
 		return null;
 	
+	}
+	@Override
+	protected Representation get(Variant variant) throws ResourceException {
+		// TODO Auto-generated method stub
+		logger.debug("test2"+variant.getMediaType()+","+MediaType.TEXT_PLAIN);
+		logger.debug("into GET RoleTypeResource");
+		Pagging page =new Pagging(); 
+		th.co.imake.syndome.bpm.hibernate.bean.User bpsTerm = new th.co.imake.syndome.bpm.hibernate.bean.User();
+		@SuppressWarnings({ "rawtypes" })
+		List result = (List) userService.searchUser(bpsTerm, page);
+		if (result != null && result.size() == 2) {
+			@SuppressWarnings("unchecked")
+		/*	java.util.ArrayList<th.co.imake.syndome.bpm.hibernate.bean.User> ntcCalendars = (java.util.ArrayList<th.co.imake.syndome.bpm.hibernate.bean.User>) result
+					.get(0);
+			String faqs_size = (String) result.get(1);*/
+			VResultMessage vresultMessage = new VResultMessage();
+			List<th.co.imake.syndome.bpm.xstream.User> xntcCalendars = new ArrayList<th.co.imake.syndome.bpm.xstream.User>();
+			th.co.imake.syndome.bpm.xstream.User user=new th.co.imake.syndome.bpm.xstream.User();
+			user.setUsername("chatchai");
+			xntcCalendars.add(user);
+			/*if (faqs_size != null && !faqs_size.equals(""))
+				vresultMessage.setMaxRow(faqs_size);
+			if (ntcCalendars != null && ntcCalendars.size() > 0) {
+				xntcCalendars = getxUserObject(ntcCalendars);
+			}*/
+			vresultMessage.setResultListObj(xntcCalendars);
+			//System.out.println("xx");
+			 XStream xstream2 = new XStream(new JettisonMappedXmlDriver());
+			return getRepresentationCommon(null, vresultMessage, xstream2,"json");
+		}
+		return null;	
 	}
 	private Representation returnUpdateRecord(Representation entity,th.co.imake.syndome.bpm.xstream.User xbpsTerm,int updateRecord){
 		VResultMessage vresultMessage = new VResultMessage();

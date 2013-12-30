@@ -2,17 +2,14 @@ package th.co.imake.syndome.bpm.rest.resource;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
-import org.springframework.beans.BeanUtils;
 
 import th.co.imake.syndome.bpm.constant.ServiceConstant;
 import th.co.imake.syndome.bpm.managers.PstObjectService;
@@ -71,63 +68,10 @@ public class PstObjectResource extends BaseResource {
 						}else if(serviceName.equals(ServiceConstant.PST_OBJECT_EXECUTE)){
 							int updateRecord=pstObjectService.executeQuery(xbpsTerm.getQuery()); 
 							return returnUpdateRecord(entity,xbpsTerm,updateRecord);
-						}else if(serviceName.equals(ServiceConstant.PST_OBJECT_UPDATE)){
-							int updateRecord=pstObjectService.executeQueryUpdate(xbpsTerm.getQueryDelete(),xbpsTerm.getQueryUpdate()); 
+						}else if(serviceName.equals(ServiceConstant.PST_OBJECT_EXECUTE_WITH_VALUES)){
+							 int updateRecord=pstObjectService.executeQueryWithValues(xbpsTerm.getQuery(),xbpsTerm.getValues()); 
 							return returnUpdateRecord(entity,xbpsTerm,updateRecord);
-						} else if(serviceName.equals(ServiceConstant.PST_OBJECT_EXECUTE_MAINTENANCE)){
-							int updateRecord=0;
-							th.co.imake.syndome.bpm.hibernate.bean.PstMaintenanceTran pstMaintenanceTran =null;
-							th.co.imake.syndome.bpm.hibernate.bean.PstMaintenance[] pstMaintenances=null;
-							if(xbpsTerm.getPstMaintenanceArray()!=null){
-								th.co.imake.syndome.bpm.xstream.PstMaintenance[] xpstMaintenances=xbpsTerm.getPstMaintenanceArray();
-								int size=xbpsTerm.getPstMaintenanceArray().length;
-								 pstMaintenances=new th.co.imake.syndome.bpm.hibernate.bean.PstMaintenance[size];
-								for (int i = 0; i < size; i++) {
-									th.co.imake.syndome.bpm.hibernate.bean.PstMaintenance pstMaintenance = new th.co.imake.syndome.bpm.hibernate.bean.PstMaintenance();
-									BeanUtils.copyProperties(xpstMaintenances[i],pstMaintenance,ignore);
-									th.co.imake.syndome.bpm.hibernate.bean.PstMaintenancePK pk=new th.co.imake.syndome.bpm.hibernate.bean.PstMaintenancePK();
-									if(xpstMaintenances[i].getPrpId()!=null)
-										pk.setPrpId(xpstMaintenances[i].getPrpId());
-									if(xpstMaintenances[i].getPdId()!=null)
-										pk.setPdId(xpstMaintenances[i].getPdId());
-									if(xpstMaintenances[i].getPwtId()!=null)
-										pk.setPwtId(xpstMaintenances[i].getPwtId());
-									pstMaintenance.setId(pk);
-									pstMaintenances[i]=pstMaintenance;
-								}
-							}
-							if(xbpsTerm.getPstMaintenanceTran()!=null){
-								
-									  pstMaintenanceTran = new th.co.imake.syndome.bpm.hibernate.bean.PstMaintenanceTran();
-									BeanUtils.copyProperties(xbpsTerm.getPstMaintenanceTran(),pstMaintenanceTran,ignore2);
-									th.co.imake.syndome.bpm.hibernate.bean.PstMaintenanceTranPK pk=new th.co.imake.syndome.bpm.hibernate.bean.PstMaintenanceTranPK();
-								 
-									if(xbpsTerm.getPstMaintenanceTran().getPrpId()!=null)
-										pk.setPrpId(xbpsTerm.getPstMaintenanceTran().getPrpId());
-									if(xbpsTerm.getPstMaintenanceTran().getPmaintenanceDocNo()!=null)
-										pk.setPmaintenanceDocNo(xbpsTerm.getPstMaintenanceTran().getPmaintenanceDocNo());
-									pstMaintenanceTran.setId(pk);
-									if(xbpsTerm.getPstMaintenanceTran().getPmaintenanceCheckTimeStr()!=null && xbpsTerm.getPstMaintenanceTran().getPmaintenanceCheckTimeStr().length()>0){
-										Date pmaintenanceCheckTime=null;
-										try {
-											pmaintenanceCheckTime=format1.parse(xbpsTerm.getPstMaintenanceTran().getPmaintenanceCheckTimeStr());
-										} catch (ParseException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										}
-										pstMaintenanceTran.getId().setPmaintenanceCheckTime(pmaintenanceCheckTime);
-									}
-							}
-								
-							 updateRecord=pstObjectService.executeMaintenance(pstMaintenances,pstMaintenanceTran,xbpsTerm.getMode()
-									 ,xbpsTerm.getPstMaintenanceTran().getPmaintenanceCheckTimeStr(),xbpsTerm.getPstMaintenanceTran().getPmaintenanceCheckTimeOldStr());
-							return returnUpdateRecord(entity,xbpsTerm,updateRecord);
-						} 
-						
-						/*else if(serviceName.equals(ServiceConstant.PST_OBJECT_DELETE)){
-							int updateRecord=pstObjectService.executeQueryDelete(xbpsTerm.getQuery()); 
-							return returnUpdateRecord(entity,xbpsTerm,updateRecord);
-						}*/
+						}  
 						
 					} else {
 					}
