@@ -32,10 +32,10 @@
       <MaxFileSize>512KB</MaxFileSize>
     </triggeringPolicy>
   </appender>
-  <logger name="SynDomeLog" level="DEBUG">
+  <logger name="SynDomeLog" level="INFO">
     <appender-ref ref="SynDomeAppender"/>
   </logger>
-  <root level="DEBUG">
+  <root level="INFO">
     <appender-ref ref="stdout"/> 
    <!--  <appender-ref ref="SynDomeAppender"/> -->
   </root>
