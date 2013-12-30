@@ -1,3 +1,3 @@
 <script type="text/javascript">
-var SCHEMA_G='PST_DB';
+var SCHEMA_G='SYNDOME_BPM_DB';
 </script>
