@@ -266,6 +266,7 @@ public abstract class BaseResource extends ServerResource {
 	}
 	public Representation getRepresentationCommon(Representation entity, VResultMessage vresultMessage,
 			com.thoughtworks.xstream.XStream xstream,String mediaType) {
+		//System.out.println(mediaType.indexOf("json")!=-1);
 		if(mediaType.indexOf("json")!=-1)
 			return getJsonRepresentation(entity, vresultMessage, xstream);
 		else
@@ -397,8 +398,10 @@ public abstract class BaseResource extends ServerResource {
 
 		//document.normalizeDocument();
 		//try {
+	//	System.out.println(xml);
+		
 			representation_aoe = new JsonRepresentation(xml);
-			 //MediaType.APPLICATION_JSON);
+		//	MediaType.APPLICATION_JSON);
 				//	MediaType.APPLICATION_ATOM_XML);
 			Form responseHeaders = (Form) getResponse().getAttributes().get("org.restlet.http.headers");
 			if (responseHeaders == null)
@@ -406,7 +409,7 @@ public abstract class BaseResource extends ServerResource {
 			responseHeaders = new Form();
 			getResponse().getAttributes().put("org.restlet.http.headers", responseHeaders);
 			}
-			responseHeaders.add("Access-Control-Allow-Origin", "*");
+			//responseHeaders.add("Access-Control-Allow-Origin", "*");
 		/*} catch (IOException e) {
 			// TODO Auto-generated catch block
 			logger.error("xml="+xml);

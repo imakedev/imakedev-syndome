@@ -36,10 +36,10 @@ public class CommonResourceApplication extends Application {
     	//System.out.println("yyyyyyyyyyyy createInboundRoot xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
     	final   ClassPathXmlApplicationContext springContext = new ClassPathXmlApplicationContext(
                  new String[] {
-                		 "th/co/aoe/imake/pst/rest/config/applicationContext-common.xml",
-                		 "th/co/aoe/imake/pst/rest/config/applicationContext-hibernate.xml",
-                		 "th/co/aoe/imake/pst/rest/config/applicationContext-pst-resource.xml",
-                		 "th/co/aoe/imake/pst/rest/config/applicationContext-root-router.xml"});    
+                		 "th/co/imake/syndome/bpm/rest/config/applicationContext-common.xml",
+                		 "th/co/imake/syndome/bpm/rest/config/applicationContext-hibernate.xml",
+                		 "th/co/imake/syndome/bpm/rest/config/applicationContext-syndome-bpm-resource.xml",
+                		 "th/co/imake/syndome/bpm/rest/config/applicationContext-root-router.xml"});  
         // Add a route for the MailRoot resource
     	org.restlet.ext.spring.SpringRouter router = (org.restlet.ext.spring.SpringRouter)springContext.getBean("root");
     	springContext.close();
