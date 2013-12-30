@@ -13,11 +13,11 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.support.WebBindingInitializer;
 import org.springframework.web.context.request.WebRequest;
 
-public class MissConsultBindingInitializer
+public class SyndomeBPMBindingInitializer
     implements WebBindingInitializer
 {
 
-    public MissConsultBindingInitializer()
+    public SyndomeBPMBindingInitializer()
     {
     }
 

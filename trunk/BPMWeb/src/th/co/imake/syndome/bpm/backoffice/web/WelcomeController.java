@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
-import th.co.imake.syndome.bpm.backoffice.service.PSTService;
+import th.co.imake.syndome.bpm.backoffice.service.SynDomeBPMService;
 
 @Controller
 @SessionAttributes(value={"UserMissContact"})
@@ -65,6 +65,6 @@ public class WelcomeController
     //private static Logger logger = Logger.getRootLogger();
     private static final Logger logger = LoggerFactory.getLogger(ServiceConstant.LOG_APPENDER);*/
     @Autowired
-    private PSTService missExamService;
+    private SynDomeBPMService missExamService;
 
 }

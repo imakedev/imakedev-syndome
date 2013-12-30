@@ -9,33 +9,35 @@ import org.directwebremoting.WebContextFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import th.co.aoe.imake.pst.xstream.PstMaintenance;
-import th.co.aoe.imake.pst.xstream.PstMaintenanceTran;
-import th.co.imake.syndome.bpm.backoffice.service.PSTService;
+import th.co.imake.syndome.bpm.backoffice.service.SynDomeBPMService;
 
-public class PSTAjax {
-	private final PSTService pstService; 
-	public PSTAjax(){
+public class SynDomeBPMAjax {
+	private final SynDomeBPMService synDomeBPMService; 
+	public SynDomeBPMAjax(){
 		WebContext ctx = WebContextFactory.get(); 
 		ServletContext servletContext = ctx.getServletContext();
     	WebApplicationContext wac = WebApplicationContextUtils.
     	getRequiredWebApplicationContext(servletContext);
-    	pstService = (PSTService)wac.getBean("pstService"); 
+    	synDomeBPMService = (SynDomeBPMService)wac.getBean("synDomeBPMService"); 
 	}   
 	@SuppressWarnings("rawtypes")
 	public List searchObject(String query){
-		return pstService.searchObject(query);
+		return synDomeBPMService.searchObject(query);
 	}
 	public int executeQuery(String[] query){
-		return pstService.executeQuery(query);
-	} 
+		return synDomeBPMService.executeQuery(query);
+	}
+	public int executeQueryWithValues(String[] query,List<String[]> values){
+		return synDomeBPMService.executeQuery(query, values);
+	}
 	public int executeQueryUpdate(String[] queryDelete,String[] queryUpdate){
-		return pstService.executeQueryUpdate(queryDelete,queryUpdate);
+		return synDomeBPMService.executeQueryUpdate(queryDelete,queryUpdate);
 	} 
-	public int executeMaintenance(PstMaintenance[] pstMaintenance,PstMaintenanceTran pstMaintenanceTran,String mode){
-		return pstService.executeMaintenance(pstMaintenance,pstMaintenanceTran,mode);
-	} 
+	 
+	public String getRunningNo(String module,String format_year_month_day,String digit,String local){
+		return synDomeBPMService.getRunningNo(module,format_year_month_day,digit,local);
+	}
 	/*public int executeQueryDelete(String[] queryUpdate){
-		return pstService.executeQueryDelete(queryUpdate);
+		return synDomeBPMService.executeQueryDelete(queryUpdate);
 	}*/
 }

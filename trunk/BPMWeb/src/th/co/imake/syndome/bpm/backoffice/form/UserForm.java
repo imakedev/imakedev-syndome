@@ -9,14 +9,14 @@ public class UserForm  extends CommonForm implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private th.co.aoe.imake.pst.xstream.User user;
+	private th.co.imake.syndome.bpm.xstream.User user;
 	public UserForm() {
-		user=new th.co.aoe.imake.pst.xstream.User();
+		user=new th.co.imake.syndome.bpm.xstream.User();
 	}
-	public th.co.aoe.imake.pst.xstream.User getUser() {
+	public th.co.imake.syndome.bpm.xstream.User getUser() {
 		return user;
 	}
-	public void setUser(th.co.aoe.imake.pst.xstream.User user) {
+	public void setUser(th.co.imake.syndome.bpm.xstream.User user) {
 		this.user = user;
 	}
 	

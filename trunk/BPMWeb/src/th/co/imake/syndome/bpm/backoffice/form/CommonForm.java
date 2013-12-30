@@ -6,7 +6,7 @@
 package th.co.imake.syndome.bpm.backoffice.form;
 
 import java.io.Serializable;
-import th.co.aoe.imake.pst.xstream.common.Pagging;
+import th.co.imake.syndome.bpm.xstream.common.Pagging;
 
 public class CommonForm
     implements Serializable

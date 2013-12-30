@@ -1,6 +1,9 @@
 package th.co.imake.syndome.bpm.backoffice.web;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -16,12 +19,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.CellRangeAddress;
 import org.apache.poi.hssf.util.CellReference;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.Font;
@@ -34,14 +39,19 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import th.co.imake.syndome.bpm.backoffice.service.PSTService;
+import th.co.imake.syndome.bpm.backoffice.service.SynDomeBPMService;
 
 @Controller
 @RequestMapping(value = { "/report" })
 public class ReportController {
 	@Autowired
-	private PSTService pstService;
+	private SynDomeBPMService pstService;
+	@Autowired
+	private SynDomeBPMService synDomeBPMService;
+	
 	private static SimpleDateFormat format = new SimpleDateFormat("MMM_yyyy");
+	
+	private static SimpleDateFormat format_check = new SimpleDateFormat("dd_MM_yyyy");
 
 	private static Locale locale = new Locale("th", "TH");
 	public static NumberFormat format_number = NumberFormat.getNumberInstance();
@@ -54,6 +64,8 @@ public class ReportController {
 		bundle = ResourceBundle.getBundle("config");
 
 	}
+
+	private String schema=bundle.getString("schema");
 	private static final String SCHEMA = bundle.getString("schema");
 
 	@RequestMapping(value = { "/init" }, method = { org.springframework.web.bind.annotation.RequestMethod.GET })
@@ -63,20 +75,21 @@ public class ReportController {
 	}
 
 	@RequestMapping(value = { "/page/{pagename}" }, method = { org.springframework.web.bind.annotation.RequestMethod.GET })
-	public String page(Model model, @PathVariable String pagename) {
+	public String page(Model model, @PathVariable String pagename,HttpServletRequest request) {
 		//return "backoffice/template/" + pagename;
+		
 		return "backoffice/template/empty";
 	}
 
 	// @SuppressWarnings({ "deprecation", "unchecked" })
-	@RequestMapping(value = { "/export_report1" }, method = { org.springframework.web.bind.annotation.RequestMethod.GET })
-	public void export(HttpServletRequest request,
+	@RequestMapping(value = { "/dailyReport/{username}/{duedate}" }, method = { org.springframework.web.bind.annotation.RequestMethod.GET })
+	public void dailyReport(HttpServletRequest request,
 			HttpServletResponse response, Model model,
-			SecurityContextHolderAwareRequestWrapper srequest) {
-		String time_from = request.getParameter("from");
+			SecurityContextHolderAwareRequestWrapper srequest,@PathVariable String username,@PathVariable String duedate) {
+		String time_from = duedate;
 		Date d = null;
 		try {
-			d = format.parse(time_from);
+			d = format_check.parse(time_from);
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -85,296 +98,366 @@ public class ReportController {
 		int day_from = dt.getDayOfMonth();
 		int month = dt.getMonthOfYear();
 		int year = dt.getYear();
-
-		int day_to = dt.dayOfMonth().getMaximumValue();
-
-		// src=src+"?from="+time_from_array+"&to="+time_to_array;
-
-		// String time_to=request.getParameter("to");
-		// String[] time_from_array=time_from.split("_");
-		// String[] time_to_array=time_to.split("_");
-		String from_sql = year + "-" + month + "-" + day_from + " 00:00:00";
-		String to_sql = year + "-" + month + "-" + day_to + " 23:59:59";
-		// 2013-05-01 00:00:00
-		StringBuffer query = new StringBuffer();
-		StringBuffer query_inner = new StringBuffer();
-		StringBuffer query_inner_sum = new StringBuffer();
-		query.append(" SELECT status.pes_id,status.pes_name FROM " + SCHEMA
-				+ ".PST_EMPLOYEE_STATUS status order by status.pes_id");
-		// String query1=
-
-		HSSFWorkbook wb = new HSSFWorkbook();
-		// HSSFSheet sheet =
-		// wb.createSheet(time_from_array[0]+"/"+" ถึง "+time_to+"สรุปบันทึกการขาด ลา มาสาย พนง.");
-		// / HSSFSheet sheet =
-		// wb.createSheet(time_from_array[0]+"-"+time_from_array[1]+"-"+time_from_array[2]+" ถึง "+time_to_array[0]+"-"+time_to_array[1]+"-"+time_to_array[2]);
-		HSSFSheet sheet = wb.createSheet("ค่าแรงพนักงานรายวัน");
-
-		// HSSFRow row = sheet.createRow(0);
-		// HSSFCellStyle style = wb.createCellStyle();
-		String[] label = { "รหัสประจำตัว", "เบอร์รถ", "ชื่อ-สกุล", "ตำแหน่ง",
-				"ค่าแรง/วัน" };
-		int indexRow = 2;
-		HSSFCellStyle cellStyle = wb.createCellStyle();
-		HSSFCellStyle cellStyle2 = wb.createCellStyle();
-		HSSFCellStyle cellStyle3 = wb.createCellStyle();
-		cellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-		cellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-		cellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-		cellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-		cellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
-		cellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
-
-		cellStyle.setFillBackgroundColor(new HSSFColor.GREY_25_PERCENT()
-				.getIndex());
-		cellStyle.setWrapText(true);
-
-		cellStyle2.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-		cellStyle2.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-		cellStyle2.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-		cellStyle2.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-		cellStyle2.setBorderRight(HSSFCellStyle.BORDER_THIN);
-		cellStyle2.setBorderTop(HSSFCellStyle.BORDER_THIN);
-		cellStyle2.setWrapText(true);
-
-		Font font = wb.createFont();
-		font.setFontHeightInPoints((short) 13);
-		cellStyle2.setFont(font);
-
-		cellStyle3.setAlignment(HSSFCellStyle.ALIGN_LEFT);
-		cellStyle3.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-		cellStyle3.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-		cellStyle3.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-		cellStyle3.setBorderRight(HSSFCellStyle.BORDER_THIN);
-		cellStyle3.setBorderTop(HSSFCellStyle.BORDER_THIN);
-		cellStyle3.setWrapText(true);
-
-		sheet.addMergedRegion(new CellRangeAddress(0, // first row (0-based)
-				0, // last row (0-based)
-				2, // first column (0-based)
-				10 // last column (0-based)
-		));
-		HSSFRow row = sheet.createRow(0);
-		HSSFCell cell = row.createCell(2);
-		// cell = row.createCell(2);
-		// cell.setCellValue("ค่าแรงพนักงานรายวัน  ประจำเดือน _____________________");
-		cell.setCellValue("ค่าแรงพนักงานรายวัน  ประจำเดือน "
-				+ dt.monthOfYear().getAsText(locale) + " "
-				+ dt.year().getAsText());
-		cell.setCellStyle(cellStyle2);
-		cell = row.createCell(10);
-		cell.setCellStyle(cellStyle);
-		row = sheet.createRow(indexRow);
-		int index = 0;
-		// Header 5
-		/*
-		 * HSSFRow row = sheet.createRow(indexRow); HSSFCell cell =
-		 * row.createCell(0); int index=0; รหัสประจำตัว เบอร์รถ
-		 */
-		for (int i = 0; i < label.length; i++) {
-			cell = row.createCell(index++);
-			cell.setCellValue(label[i]);
-			cell.setCellStyle(cellStyle);
-		}
-
-		/*
-		 * cell = row.createCell(index++); cell.setCellValue("ชื่อ-สกุล");
-		 * cell.setCellStyle(cellStyle); cell = row.createCell(index++);
-		 * cell.setCellValue("ตำแหน่ง"); cell.setCellStyle(cellStyle);
-		 */
-		List<Object[]> status = pstService.searchObject(query.toString());
-		int status_size = status.size();
-		for (Object[] objects : status) {
-			cell = row.createCell(index++);
-			cell.setCellValue((String) objects[1]);
-			cell.setCellStyle(cellStyle);
-			query_inner
-					.append("   (select count(*) FROM "
-							+ SCHEMA
-							+ ".PST_EMPLOYEE_WORK_MAPPING mapping"
-							+ "    where mapping.pe_id=emp.pe_id and mapping.pes_id in("
-							+ (Integer) objects[0] + ")"
-							+ "   and mapping.pewm_date_time between '"
-							+ from_sql + "' and '" + to_sql + "' ) as work_"
-							+ (Integer) objects[0] + " , ");
-			query_inner_sum
-					.append(" ,  (select  (pst_status.pes_wage_rate*(count(*))) FROM "
-							+ SCHEMA
-							+ ".PST_EMPLOYEE_WORK_MAPPING mapping"
-							+ "   left join  "
-							+ SCHEMA
-							+ ".PST_EMPLOYEE_STATUS pst_status on (mapping.pes_id=pst_status.pes_id) "
-							+ " where mapping.pe_id=emp.pe_id and mapping.pes_id in("
-							+ (Integer) objects[0]
-							+ ")"
-							+ "   and mapping.pewm_date_time between '"
-							+ from_sql
-							+ "' and '"
-							+ to_sql
-							+ "' ) as work_sum_" + (Integer) objects[0] + "  ");
-		}
-		cell = row.createCell(index++);
-		cell.setCellValue("วันทำงานสะสม");
-		cell.setCellStyle(cellStyle);
-
-		cell = row.createCell(index++);
-		cell.setCellValue("ค่าแรง(บาท)");
-		cell.setCellStyle(cellStyle);
-		indexRow++;
-
-		for (int i = 0; i < index; i++) {
-			if (i == 2 || i == 3)
-				sheet.setColumnWidth(i, (short) ((50 * 8) / ((double) 1 / 20)));
-			else
-				sheet.setColumnWidth(i, (short) ((20 * 8) / ((double) 1 / 20)));
-		}
-		query.setLength(0);
-		query.append(" SELECT status.pes_id,status.pes_name FROM " + SCHEMA
-				+ ".PST_EMPLOYEE_STATUS status where status.pes_wage_rate>0");
-
-		List<Object[]> work_days = pstService.searchObject(query.toString());
-		StringBuffer status_in = new StringBuffer();
-		int work_days_size = work_days.size();
-		for (int i = 0; i < work_days_size; i++) {
-			if (i != (work_days_size - 1))
-				status_in.append((Integer) work_days.get(i)[0] + ",");
-			else
-				status_in.append((Integer) work_days.get(i)[0] + "");
-		}
-		query_inner.append("   (select count(*) FROM " + SCHEMA
-				+ ".PST_EMPLOYEE_WORK_MAPPING mapping"
-				+ "    where mapping.pe_id=emp.pe_id and mapping.pes_id in("
-				+ status_in + ")" + "   and mapping.pewm_date_time between '"
-				+ from_sql + "' and '" + to_sql + "' ) as work_all , ");
-		query.setLength(0);
-		query.append("SELECT "
-				+ query_inner.toString()
-				+ " "
-				+ " emp.pe_uid, pump.prp_no, emp.pe_first_name,emp.pe_last_name,pos.pp_name,emp.pe_wage,IFNULL(title.PT_NAME,'') "
-				+ query_inner_sum.toString() + " from " + SCHEMA
-				+ ".PST_EMPLOYEE emp left join  " + SCHEMA
-				+ ".PST_POSITION pos" + " on emp.pp_id=pos.pp_id left join  "
-				+ SCHEMA + ".PST_ROAD_PUMP pump"
-				+ " on emp.prp_id=pump.prp_id  " + " left join " + SCHEMA
-				+ ".PST_TITLE title on emp.PT_ID=title.PT_ID ");
-
-		/*
-		 * SELECT (select count(*) FROM PST_DB2.PST_EMPLOYEE_WORK_MAPPING
-		 * mapping where mapping.pe_id=emp.pe_id and mapping.pes_id in(1,2) and
-		 * mapping.pewm_date_time between '2013-05-01 00:00:00' and '2013-05-31
-		 * 00:00:00' ) as work_normal, (select count(*) FROM
-		 * PST_DB2.PST_EMPLOYEE_WORK_MAPPING mapping where
-		 * mapping.pe_id=emp.pe_id and mapping.pes_id in(2) and
-		 * mapping.pewm_date_time between '2013-05-01 00:00:00' and '2013-05-31
-		 * 00:00:00' ) as work_special, (select count(*) FROM
-		 * PST_DB2.PST_EMPLOYEE_WORK_MAPPING mapping where
-		 * mapping.pe_id=emp.pe_id and mapping.pes_id in(3,4,5,6) and
-		 * mapping.pewm_date_time between '2013-05-01 00:00:00' and '2013-05-31
-		 * 00:00:00' ) as work_leave , emp.* from PST_DB2.PST_EMPLOYEE emp
-		 */
-		List<Object[]> emps = pstService.searchObject(query.toString());
-		int rowIndex = 1;
-		int emps_size = emps.size();
-		for (int i = 0; i < emps_size; i++) {
-			// for(status_size)
-			row = sheet.createRow(indexRow);
-			indexRow++;
-			index = 0;
-			cell = row.createCell(index++);
-			cell.setCellValue((String) emps.get(i)[status_size + 1]);
-			cell.setCellStyle(cellStyle3);
-
-			cell = row.createCell(index++);
-			cell.setCellValue((String) emps.get(i)[status_size + 2]);
-			cell.setCellStyle(cellStyle3);
-
-			cell = row.createCell(index++);
-			cell.setCellValue((rowIndex++) + ". "
-					+ (String) emps.get(i)[status_size + 7] + " "
-					+ (String) emps.get(i)[status_size + 3] + " "
-					+ (String) emps.get(i)[status_size + 4]);
-			cell.setCellStyle(cellStyle3);
-
-			cell = row.createCell(index++);
-			cell.setCellValue((String) emps.get(i)[status_size + 5]);
-			cell.setCellStyle(cellStyle3);
-
-			cell = row.createCell(index++);
-			cell.setCellValue(((java.math.BigDecimal) emps.get(i)[status_size + 6])
-					.intValue());
-			cell.setCellStyle(cellStyle3);
-			int sum = 0;
-			for (int j = 0; j < status_size; j++) {
-				cell = row.createCell(index++);
-				// cell.setCellValue((java.math.BigInteger)emps.get(i)[j]+"");
-				cell.setCellValue(((java.math.BigInteger) emps.get(i)[j])
-						.intValue());
-				if (emps.get(i)[j + status_size + 8] != null)
-					sum = sum
-							+ ((java.math.BigInteger) emps.get(i)[j
-									+ status_size + 8]).intValue();
-				cell.setCellStyle(cellStyle3);
+	    System.out.println(year+"-"+month+"-"+day_from);
+    	String filePath = bundle.getString("dailyReportPath")+"DailyReport.xls";
+		FileInputStream fileIn = null;
+		HSSFWorkbook wb = null;
+		try {
+			try {
+				fileIn = new FileInputStream(filePath);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			cell = row.createCell(index++);
-			cell.setCellValue((java.math.BigInteger) emps.get(i)[status_size]
-					+ "");
-			cell.setCellStyle(cellStyle3);
-
-			sum = sum
-					* ((java.math.BigDecimal) emps.get(i)[status_size + 6])
-							.intValue();
-			cell = row.createCell(index++);
-			cell.setCellValue(sum);
-			cell.setCellStyle(cellStyle3);
+			POIFSFileSystem fs = null;
+			try {
+				fs = new POIFSFileSystem(fileIn);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			try {
+				wb = new HSSFWorkbook(fs);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			String firstName_lastName="";
+			String day="";
+			String query="SELECT concat(u.firstName,\" \",u.lastName ) as uname," +
+					" IFNULL(DATE_FORMAT(to_do.BTDL_DUE_DATE,'%d/%m/%Y'),'') as d1 ," +
+					" so.BSO_DELIVERY_LOCATION," +
+					" concat(so.BSO_DELIVERY_ADDR1,\" \",so.BSO_DELIVERY_ADDR2,\" \",so.BSO_DELIVERY_ADDR3,\" \",so.BSO_DELIVERY_PROVINCE) as address," +
+					"so.BSO_IS_DELIVERY," +
+					" so.BSO_INV_NO," +
+					" \"\" n1, "+
+					" \"\" n2, "+
+					" concat(so.BSO_DELIVERY_CONTACT,\" \",so.BSO_DELIVERY_TEL_FAX) contact ," +
+					" \"\" n3, "+
+					" \"\" n4, "+
+					" IFNULL(DATE_FORMAT(to_do.BTDL_DUE_DATE,'%d/%m/%Y  %H:%i'),'') as d2" +
+					" FROM "+schema+".BPM_TO_DO_LIST to_do left join " +
+					" "+schema+".user u on to_do.BTDL_OWNER=u.username  left join "+schema+".BPM_SALE_ORDER so" +
+					" on (to_do.REF_NO=so.BSO_TYPE_NO and to_do.BTDL_REF=so.BSO_ID)" +
+					" where ( to_do.BTDL_STATE='wait_for_operation_delivery' or " +
+					" to_do.BTDL_STATE='wait_for_operation_install' )" +
+					" and to_do.BTDL_OWNER_TYPE='1'" +
+					" and to_do.BTDL_DUE_DATE between '"+year+"-"+month+"-"+day_from+" 00:00:00' and" +
+					" '"+year+"-"+month+"-"+day_from+" 23:59:59' " +
+					" and lower(to_do.BTDL_OWNER)=lower('"+username+"') " +
+					" and to_do.btdl_hide='1' ";
+			
+			//String[] column_array={"J1","C4","E4","C5","C6","C7","C9","H4","G5","G6","G7","G8","G9","G10","G11","G12"};
+			//String[] column_default={"","","แขวง/ตำบล ","เขต/อำเภอ ","จ. ","      "};
+			//int[] column_array_value={0,1,2,3,4,6};
+			CellReference cellReference=null;
+			HSSFSheet sheet=null;
+			HSSFCell cell = null;
+			HSSFRow row = null;
+			Object obj=null;
+			 
+			List<Object[]> product_item = synDomeBPMService.searchObject(query);
+			int product_item_size = product_item!=null?product_item.size():0;
+			int index=6;
+			String[] item_label={"D","E","G","H","I","J","K","L","M","N"}; // C O
+			//int[] item_value={0,1,3};
+			//String[] item_subfix={" ชิ้น","",""};
+			if(product_item_size>0){ 
+				sheet = wb.getSheetAt(0);
+				 firstName_lastName="ช่างเทคนิค  "+(String)product_item.get(0)[0];
+				 day="ใบสรุปผลการปฎิบัติงาน / รายงานประจำวัน  "+(String)product_item.get(0)[1];
+				for (int i = 0; i < product_item_size; i++) {
+					//String IS_SERIAL=(String)product_item.get(i)[2];
+					cellReference= new CellReference("C"+index);
+					row = sheet.getRow(cellReference.getRow());
+					if(row==null)
+						row=sheet.createRow(cellReference.getRow());
+					cell =row.getCell((int)cellReference.getCol());
+					if(cell==null)
+						cell = row.createCell((int)cellReference.getCol());
+					cell.setCellValue((i+1)+"");
+					for (int j = 0; j < item_label.length; j++) {
+						//System.out.println(item_label[j]+index);
+						cellReference= new CellReference(item_label[j]+index);
+						row = sheet.getRow(cellReference.getRow());
+						if(row==null)
+							row=sheet.createRow(cellReference.getRow());
+						cell =row.getCell((int)cellReference.getCol());
+						if(cell==null)
+							cell = row.createCell((int)cellReference.getCol());
+						//System.out.println("cell->"+cell);
+						obj=product_item.get(i)[j+2];
+						//System.out.println(obj);
+						if(obj!=null){
+							String 	value=(String)obj;
+							if(j==2)
+								if(value.equals("1")) // ขนส่ง
+									value="ขนส่ง";
+							cell.setCellValue(value);
+						}
+						else
+							cell.setCellValue("");
+					}
+					index++;
+				}
+				cellReference= new CellReference("B2");
+				row = sheet.getRow(cellReference.getRow());
+				if(row==null)
+					row=sheet.createRow(cellReference.getRow());
+				cell =row.getCell((int)cellReference.getCol());
+				if(cell==null)
+					cell = row.createCell((int)cellReference.getCol());
+				cell.setCellValue(day);
+				
+				cellReference= new CellReference("B3");
+				row = sheet.getRow(cellReference.getRow());
+				if(row==null)
+					row=sheet.createRow(cellReference.getRow());
+				cell =row.getCell((int)cellReference.getCol());
+				if(cell==null)
+					cell = row.createCell((int)cellReference.getCol());
+				cell.setCellValue(firstName_lastName);
+			}
+			HSSFFormulaEvaluator.evaluateAllFormulaCells(wb);
+			
+		} finally {
+			if (fileIn != null)
+				try {
+					fileIn.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		}
-		response.setHeader("Content-Type",
-				"application/octet-stream; charset=UTF-8");
-		String filename = "ค่าแรง.xls";
-		if (filename.length() > 0) {
+		String filename=username+"_"+duedate+".xls";
+		String userAgent = request.getHeader("user-agent");
+		boolean isInternetExplorer = (userAgent.indexOf("MSIE") > -1);
+		
+		byte[] fileNameBytes=null;
+		try {
+			fileNameBytes = filename.getBytes((isInternetExplorer) ? ("windows-1250") : ("utf-8"));
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		 String dispositionFileName = "";
+		 //for (byte b: fileNameBytes) dispositionFileName += (char)(b & 0xff);
+	    for (byte b: fileNameBytes) dispositionFileName += (char)(b & 0xff);
+
+		 String disposition = "attachment; filename=\"" + dispositionFileName + "\"";
+		 response.setHeader("Content-disposition", disposition);
+					      OutputStream out=null;
+						try {
+							out = response.getOutputStream();
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} 
+						try {
+							wb.write(out);
+						
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} finally {
+					         if (out != null) {
+					            try { 
+									  out.flush();
+								      out.close();
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+					         }
+						 }
+	
+	}
+	  @RequestMapping(value={"/storeReport/{id}"}, method={org.springframework.web.bind.annotation.RequestMethod.GET})
+	    public void storeReport(HttpServletRequest request,HttpServletResponse response
+	    		,@PathVariable String id)
+	    {
+	    	String filePath = bundle.getString("storePath")+"StoreReport.xls";
+			FileInputStream fileIn = null;
+			HSSFWorkbook wb = null;
+			String BSO_RFE_NO="";
+			try {
+				try {
+					fileIn = new FileInputStream(filePath);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				POIFSFileSystem fs = null;
+				try {
+					fs = new POIFSFileSystem(fileIn);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				try {
+					wb = new HSSFWorkbook(fs);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				String query="SELECT " +
+						" so.bso_type_no," +
+						" so.BSO_SALE_ID," +
+						" so.CUSCOD," +
+						" cust.CONTACT," +
+						" cust.CUSNAM," +
+						" cust.ADDR01," +
+						" cust.TELNUM," +
+						" IFNULL(DATE_FORMAT(so.BSO_DELIVERY_DUE_DATE,'%d/%m/%Y %H:%i'),'') as d1 , "+ 
+						" so.BSO_DELIVERY_CONTACT," +
+						" so.BSO_DELIVERY_LOCATION," +
+						" so.BSO_DELIVERY_ADDR1, " +
+						" so.BSO_DELIVERY_ADDR2," +
+						" so.BSO_DELIVERY_ADDR3," +
+						" so.BSO_DELIVERY_PROVINCE," +
+						" so.BSO_DELIVERY_ZIPCODE," +
+						" so.BSO_DELIVERY_TEL_FAX " +
+					
+						" FROM "+schema+".BPM_SALE_ORDER so   left join "+schema+".BPM_ARMAS cust" +
+						" on( so.cuscod=cust.cuscod)" +
+						" WHERE so.BSO_ID="+id;
+				
+				List<Object[]> sale_order = synDomeBPMService.searchObject(query);
+				
+				int sale_order_size = sale_order!=null?sale_order.size():0;
+				String[] column_array={"J1","C4","E4","C5","C6","C7","C9","H4","G5","G6","G7","G8","G9","G10","G11","G12"};
+				//String[] column_default={"","","แขวง/ตำบล ","เขต/อำเภอ ","จ. ","      "};
+				//int[] column_array_value={0,1,2,3,4,6};
+				CellReference cellReference=null;
+				HSSFSheet sheet=null;
+				HSSFCell cell = null;
+				HSSFRow row = null;
+				Object obj=null;
+				if(sale_order_size>0){ 
+					sheet = wb.getSheetAt(0);  
+					BSO_RFE_NO	=(String)sale_order.get(0)[0];
+					for (int i = 0; i < column_array.length; i++) {
+						cellReference= new CellReference(column_array[i]);
+						row = sheet.getRow(cellReference.getRow());
+						if(row==null)
+							row=sheet.createRow(cellReference.getRow());
+						cell =row.getCell((int)cellReference.getCol());
+						if(cell==null)
+							cell = row.createCell((int)cellReference.getCol());
+						obj=sale_order.get(0)[i];
+						if(obj!=null)
+							cell.setCellValue((String)obj);
+						else
+							cell.setCellValue("");
+					}
+				}	
+				 query=" SELECT " +
+				 	  " item_map.IMA_ItemID," +
+				 	  " product.ima_itemname," +
+				 	  " item_map.IS_SERIAL," +
+				 	  " item_map.SERIAL " +
+				 	  " FROM "+schema+".BPM_SALE_PRODUCT_ITEM_MAPPING item_map" +
+				 	  " left join "+schema+".BPM_PRODUCT product on item_map.ima_itemid=product.ima_itemid "+ 
+					 " WHERE item_map.BSO_ID="+id;
+				
+				List<Object[]> product_item = synDomeBPMService.searchObject(query);
+				int product_item_size = product_item!=null?product_item.size():0;
+				int index=16;
+				String[] item_label={"C","D","I"};
+				int[] item_value={0,1,3};
+				//String[] item_subfix={" ชิ้น","",""};
+				if(product_item_size>0){ 
+					// sheet = wb.getSheetAt(0);  
+					for (int i = 0; i < product_item_size; i++) {
+						String IS_SERIAL=(String)product_item.get(i)[2];
+						
+						for (int j = 0; j < item_label.length; j++) {
+							//System.out.println(item_label[j]+index);
+							cellReference= new CellReference(item_label[j]+index);
+							row = sheet.getRow(cellReference.getRow());
+							if(row==null)
+								row=sheet.createRow(cellReference.getRow());
+							cell =row.getCell((int)cellReference.getCol());
+							if(cell==null)
+								cell = row.createCell((int)cellReference.getCol());
+							//System.out.println("cell->"+cell);
+							obj=product_item.get(i)[item_value[j]];
+							//System.out.println(obj);
+							if(obj!=null){
+								String 	value=(String)obj;
+								if(item_value[j]==3){
+									if(IS_SERIAL.equals("0"))
+										value="ไม่ระบุ";
+								}else if(item_value[j]==1){
+										value=(i+1)+". "+value;
+								}
+									
+								cell.setCellValue(value);
+							}
+							else
+								cell.setCellValue("");
+						}
+						index++;
+					}
+				}
+				HSSFFormulaEvaluator.evaluateAllFormulaCells(wb);
+				
+			} finally {
+				if (fileIn != null)
+					try {
+						fileIn.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			}
+			String filename=BSO_RFE_NO+".xls";
 			String userAgent = request.getHeader("user-agent");
 			boolean isInternetExplorer = (userAgent.indexOf("MSIE") > -1);
-			byte[] fileNameBytes = null;
+			
+			byte[] fileNameBytes=null;
 			try {
-				fileNameBytes = filename
-						.getBytes((isInternetExplorer) ? ("windows-1250")
-								: ("utf-8"));
+				fileNameBytes = filename.getBytes((isInternetExplorer) ? ("windows-1250") : ("utf-8"));
 			} catch (UnsupportedEncodingException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			String dispositionFileName = "";
-			for (byte b : fileNameBytes)
-				dispositionFileName += (char) (b & 0xff);
+			
+			 String dispositionFileName = "";
+			 //for (byte b: fileNameBytes) dispositionFileName += (char)(b & 0xff);
+		    for (byte b: fileNameBytes) dispositionFileName += (char)(b & 0xff);
 
-			String disposition = "attachment; filename=\""
-					+ dispositionFileName + "\"";
-			response.setHeader("Content-disposition", disposition);
+			 String disposition = "attachment; filename=\"" + dispositionFileName + "\"";
+			 response.setHeader("Content-disposition", disposition);
+						      OutputStream out=null;
+							try {
+								out = response.getOutputStream();
+							} catch (IOException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} 
+							try {
+								wb.write(out);
+							
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} finally {
+						         if (out != null) {
+						            try { 
+										  out.flush();
+									      out.close();
+									} catch (IOException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+						         }
+							 }
 		}
-		// response.setHeader("Content-disposition",
-		// "attachment; filename=Report.xls");
-		ServletOutputStream servletOutputStream = null;
-		try {
-			servletOutputStream = response.getOutputStream();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			wb.write(servletOutputStream);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			servletOutputStream.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			servletOutputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	@RequestMapping(value = { "/export_report2" }, method = { org.springframework.web.bind.annotation.RequestMethod.GET })
 	public void export2(HttpServletRequest request,
 			HttpServletResponse response, Model model,
@@ -2882,6 +2965,75 @@ public class ReportController {
 		response.setHeader("Content-Type",
 				"application/octet-stream; charset=UTF-8");
 		String filename = "รายงานสรุปค่าคิวรถออกงานประจำเดือน.xls";
+		if (filename.length() > 0) {
+			String userAgent = request.getHeader("user-agent");
+			boolean isInternetExplorer = (userAgent.indexOf("MSIE") > -1);
+			byte[] fileNameBytes = null;
+			try {
+				fileNameBytes = filename
+						.getBytes((isInternetExplorer) ? ("windows-1250")
+								: ("utf-8"));
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			String dispositionFileName = "";
+			for (byte b : fileNameBytes)
+				dispositionFileName += (char) (b & 0xff);
+
+			String disposition = "attachment; filename=\""
+					+ dispositionFileName + "\"";
+			response.setHeader("Content-disposition", disposition);
+		}
+		// response.setHeader("Content-disposition",
+		// "attachment; filename=Report.xls");
+		ServletOutputStream servletOutputStream = null;
+		try {
+			servletOutputStream = response.getOutputStream();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			wb.write(servletOutputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			servletOutputStream.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			servletOutputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	@RequestMapping(value = { "/export_form" }, method = { org.springframework.web.bind.annotation.RequestMethod.GET })
+	public void export_form(HttpServletRequest request,
+			HttpServletResponse response, Model model,
+			SecurityContextHolderAwareRequestWrapper srequest) { 
+		String type = request.getParameter("type");  
+		String path="/opt/form/Delivery_Form.xls"; 
+		
+	    String file_name="ฟอร์มจัดส่ง";
+	    if(type.equals("2")){
+	    	file_name="ฟอร์มติดตั้ง";
+	    	path="/opt/form/Installation_Form.xls";
+	    }
+		HSSFWorkbook wb=null;
+		try {
+			wb = new HSSFWorkbook(new FileInputStream(path));
+		} catch (FileNotFoundException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		response.setHeader("Content-Type",
+				"application/octet-stream; charset=UTF-8");
+		String filename = file_name+".xls";
 		if (filename.length() > 0) {
 			String userAgent = request.getHeader("user-agent");
 			boolean isInternetExplorer = (userAgent.indexOf("MSIE") > -1);

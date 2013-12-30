@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
-import th.co.imake.syndome.bpm.backoffice.service.PSTService;
+import th.co.imake.syndome.bpm.backoffice.service.SynDomeBPMService;
 
 @Controller
 @RequestMapping
 public class AccessController {
 	@Autowired
-	private PSTService pstService;
+	private SynDomeBPMService synDomeBPMService;
 	@RequestMapping("/login")
 	public String login(HttpServletRequest request,HttpServletResponse response,Model model, @RequestParam(required=false) String message) {
 		String language=request.getParameter("language");
@@ -51,7 +51,7 @@ public class AccessController {
 	@RequestMapping(value = "/checking")
    public String checking(Model model,HttpServletRequest request) {
 		//String userid=SecurityContextHolder.getContext().getAuthentication().getName();
-		int result=0;//pstService.checkMissTestResult(missTest);
+		int result=0;//synDomeBPMService.checkMissTestResult(missTest);
 		//0=not yet test finish, 1=  test finish
 		//String	useragent = request.getHeader("User-Agent");
 	//	String user = useragent.toLowerCase();
@@ -94,7 +94,7 @@ public class AccessController {
  	public String logoutSuccess() {
 		String message = "Logout Success!";
 		/*MissTestResult missTest=new MissTestResult();
-		int result=pstServicepstService.checkMissTestResult(missTest);
+		int result=synDomeBPMService.checkMissTestResult(missTest);
 		//0=not yet test finish, 1=  test finish
 		if(result==1){
 			message="You test finish";
