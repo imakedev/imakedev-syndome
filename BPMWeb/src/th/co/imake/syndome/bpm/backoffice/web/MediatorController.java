@@ -6,7 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import th.co.imake.syndome.bpm.backoffice.service.PSTService;
+import th.co.imake.syndome.bpm.backoffice.service.SynDomeBPMService;
 
 @Controller
 @RequestMapping("/")
@@ -17,7 +17,7 @@ public class MediatorController {
 	// private static SimpleDateFormat format1 = new SimpleDateFormat("dd/MM/yyyy");
 	 //private static SimpleDateFormat format2 = new SimpleDateFormat("dd/MM/yyyy/HH/mm/ss");
 	@Autowired
-	private PSTService missExamService;
+	private SynDomeBPMService missExamService;
 	/*@RequestMapping( method={org.springframework.web.bind.annotation.RequestMethod.GET})
 	public String getCandidateInfo(Model model) {
 		String userid=SecurityContextHolder.getContext().getAuthentication().getName();

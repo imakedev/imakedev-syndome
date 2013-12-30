@@ -13,9 +13,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
-import th.co.aoe.imake.pst.xstream.common.Pagging;
-import th.co.aoe.imake.pst.xstream.common.VResultMessage;
-import th.co.aoe.imake.pst.xstream.common.VServiceXML;
+import th.co.imake.syndome.bpm.xstream.common.Pagging;
+import th.co.imake.syndome.bpm.xstream.common.VResultMessage;
+import th.co.imake.syndome.bpm.xstream.common.VServiceXML;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.Dom4JDriver;
@@ -32,8 +32,8 @@ public class PostCommon {
 			@SuppressWarnings("rawtypes") Class[] className, String endPoint,
 			boolean isReturn) {
 		
-		HttpPost httppost = new HttpPost("http://localhost:3000/v1/" + endPoint);
-		// HttpPost httppost = new HttpPost("http://localhost:8080/BPMServices/rest/"+endPoint);
+		//HttpPost httppost = new HttpPost("http://localhost:3000/v1/" + endPoint);
+		HttpPost httppost = new HttpPost("http://localhost:8080/BPMServices/rest/"+endPoint);
 
 		// HttpPost httppost = new
 		// HttpPost("http://10.0.20.27:3000/v1/"+endPoint);

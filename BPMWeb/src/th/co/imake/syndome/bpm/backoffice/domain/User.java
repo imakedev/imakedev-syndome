@@ -1,117 +1,134 @@
-// Decompiled by DJ v3.12.12.96 Copyright 2011 Atanas Neshkov  Date: 5/27/2012 12:11:59 AM
-// Home Page: http://members.fortunecity.com/neshkov/dj.html  http://www.neshkov.com/dj.html - Check often for new version!
-// Decompiler options: packimports(3) 
-// Source File Name:   User.java
-
 package th.co.imake.syndome.bpm.backoffice.domain;
 
-import java.util.Set;
+import java.io.Serializable;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 
-// Referenced classes of package th.co.aoe.makedev.missconsult.exam.domain:
-//            Role
+/**
+ * The persistent class for the user database table.
+ * 
+ */
+@Entity
+@Table(name="user",schema="SYNDOME_BPM_DB")
+public class User implements Serializable {
+	private static final long serialVersionUID = 1L;
 
-@Entity(name="user")
-public class User
-{
+	@Id
+	private String id;
 
-    public User()
-    {
-    }
+	private byte enabled;
 
-    public Long getId()
-    {
-        return id;
-    }
+	private String firstName;
 
-    public void setId(Long id)
-    {
-        this.id = id;
-    }
+	private String lastName;
 
-    public String getFirstName()
-    {
-        return firstName;
-    }
+	private String password;
 
-    public void setFirstName(String firstName)
-    {
-        this.firstName = firstName;
-    }
+	private String type;
 
-    public String getLastName()
-    {
-        return lastName;
-    }
+	private String username;
 
-    public void setLastName(String lastName)
-    {
-        this.lastName = lastName;
-    }
+	//bi-directional many-to-one association to Role
+	/*@OneToMany(mappedBy="user")
+	private List<Role> roles;*/
 
-    public String getUsername()
-    {
-        return username;
-    }
+	//bi-directional many-to-one association to BpmRole
+	@ManyToOne
+	@JoinColumn(name="BPM_ROLE_ID")
+	private BpmRole bpmRole;
 
-    public void setUsername(String username)
-    {
-        this.username = username;
-    }
+	public User() {
+	}
 
-    public String getPassword()
-    {
-        return password;
-    }
+	public String getId() {
+		return this.id;
+	}
 
-    public void setPassword(String password)
-    {
-        this.password = password;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-   /* public Role getRole()
-    {
-        return role;
-    }
+	public byte getEnabled() {
+		return this.enabled;
+	}
 
-    public void setRole(Role role)
-    {
-        this.role = role;
-    }*/
+	public void setEnabled(byte enabled) {
+		this.enabled = enabled;
+	}
 
-    @Id
-    private Long id;
-    public Set<Role> getRole() {
+	public String getFirstName() {
+		return this.firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return this.lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getPassword() {
+		return this.password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getType() {
+		return this.type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getUsername() {
+		return this.username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	/*public List<Role> getRoles() {
+		return this.roles;
+	}
+
+	public void setRoles(List<Role> roles) {
+		this.roles = roles;
+	}*/
+
+	/*public Role addRole(Role role) {
+		getRoles().add(role);
+		role.setUser(this);
+
 		return role;
 	}
 
-	public void setRole(Set<Role> role) {
-		this.role = role;
-	}
+	public Role removeRole(Role role) {
+		getRoles().remove(role);
+		role.setUser(null);
 
-	/*public MissContact getMissContact() {
-		return missContact;
-	}
-
-	public void setMissContact(MissContact missContact) {
-		this.missContact = missContact;
+		return role;
 	}*/
 
-	private String firstName;
-    private String lastName;
-    @Column(unique=true)
-    private String username;
-    private String password;
-  /*  @OneToOne(mappedBy="user", cascade={javax.persistence.CascadeType.ALL})
-    private Role role;*/
-    @OneToMany(mappedBy="user")
-	private Set<Role> role;
-    
-/*	@OneToOne(mappedBy="mcontactUsername", cascade={CascadeType.ALL})
-    private MissContact missContact;*/
+	public BpmRole getBpmRole() {
+		return this.bpmRole;
+	}
+
+	public void setBpmRole(BpmRole bpmRole) {
+		this.bpmRole = bpmRole;
+	}
+
 }
