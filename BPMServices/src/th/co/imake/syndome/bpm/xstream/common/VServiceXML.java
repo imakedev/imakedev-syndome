@@ -56,6 +56,8 @@ public class VServiceXML implements Serializable {
 	@XStreamAlias("pagging")
 	private Pagging pagging;
 	
+	private String mediaType;
+	
 /*	@XStreamAlias("vcriteria")
 	private VCriteria vcriteria;*/
 	
@@ -135,6 +137,12 @@ public class VServiceXML implements Serializable {
 	}
 	public void setIds(String ids) {
 		this.ids = ids;
+	}
+	public String getMediaType() {
+		return mediaType;
+	}
+	public void setMediaType(String mediaType) {
+		this.mediaType = mediaType;
 	}
 
 }

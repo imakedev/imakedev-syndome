@@ -10,7 +10,7 @@ public class VMessage implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@XStreamAlias("msgCode")
-	private String msgCode;
+	private String msgCode; // ok,error
 	
 	@XStreamAlias("msgDesc")
 	private String msgDesc;

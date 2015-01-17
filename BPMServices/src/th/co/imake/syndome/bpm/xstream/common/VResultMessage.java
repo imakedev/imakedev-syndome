@@ -31,6 +31,8 @@ public class VResultMessage implements Serializable {
 	@XStreamAlias("returnId")
 	private String returnId;
 	
+	private Integer updateRecord;
+	
 	public String getReturnId() {
 		return returnId;
 	}
@@ -62,6 +64,12 @@ public class VResultMessage implements Serializable {
 	}
 	public void setLastpage(String lastpage) {
 		this.lastpage = lastpage;
+	}
+	public Integer getUpdateRecord() {
+		return updateRecord;
+	}
+	public void setUpdateRecord(Integer updateRecord) {
+		this.updateRecord = updateRecord;
 	}
 	
 	
