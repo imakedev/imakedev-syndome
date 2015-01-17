@@ -48,15 +48,16 @@
 		for the required JAR files. Alternatively you can use another connection pool
 		such as C3P0, similarly configured using Spring.
 	-->
-	<!--  
+	<!--  -->
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
 			p:driverClassName="${jdbc.driverClassName}" p:url="${jdbc.url}" p:username="${jdbc.username}"
 			p:password="${jdbc.password}"/>
-		 --> 	
-	<!--    -->
 	    
+	<!--  
+	     
      <jee:jndi-lookup id="dataSource" resource-ref="true" jndi-name="jdbc/syndomedb"/>
-       
+     
+      -->
 	<!-- JNDI DataSource for JEE environments -->
        <!--
          
@@ -98,6 +99,8 @@
      		<list> 
  			 <value>th.co.imake.syndome.bpm.hibernate.bean.BpmApplicationLog</value>
 			 <value>th.co.imake.syndome.bpm.hibernate.bean.BpmArma</value>
+			 <value>th.co.imake.syndome.bpm.hibernate.bean.BpmCallCenter</value> 
+			 <value>th.co.imake.syndome.bpm.hibernate.bean.BpmRunningNo</value> 
 			<value>th.co.imake.syndome.bpm.hibernate.bean.BpmAssign</value>
 			<value>th.co.imake.syndome.bpm.hibernate.bean.BpmCause</value>
 			<value>th.co.imake.syndome.bpm.hibernate.bean.BpmDelivery</value>
@@ -231,5 +234,7 @@
 		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
 	</bean>
 	 
- 
+    <bean id="bpmCallCenterService" class="th.co.imake.syndome.bpm.hibernate.HibernateBpmCallCenter">
+		<property name="sessionAnnotationFactory" ref="sessionFactory"></property>	 
+	</bean>
 </beans>

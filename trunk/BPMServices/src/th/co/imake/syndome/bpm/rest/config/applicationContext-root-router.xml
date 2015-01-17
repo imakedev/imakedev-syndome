@@ -19,6 +19,12 @@
 							bean="pstObjectResource" />
 					</bean>
 				</entry>
+				<entry key="/bpmCallCenter">
+				 <bean class="org.restlet.ext.spring.SpringFinder">
+						<lookup-method name="create"
+							bean="bpmCallCenterResource" />
+					</bean>
+				</entry> 
 			</map>
 		</property>
 		<!--<property name="routes[2].template.variables[URI]">
