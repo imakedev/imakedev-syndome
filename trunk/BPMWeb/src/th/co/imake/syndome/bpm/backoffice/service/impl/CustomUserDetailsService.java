@@ -25,6 +25,7 @@ import th.co.imake.syndome.bpm.backoffice.domain.MyUserDetails;
 import th.co.imake.syndome.bpm.backoffice.repository.UserRepository;
 import th.co.imake.syndome.bpm.backoffice.service.SynDomeBPMService;
 import th.co.imake.syndome.bpm.constant.ServiceConstant;
+import th.co.imake.syndome.bpm.xstream.common.VResultMessage;
 //import java.util.logging.Logger;
 //import org.apache.log4j.Logger;
 //import ch.qos.logback.classic.Logger;
@@ -101,7 +102,8 @@ public class CustomUserDetailsService implements UserDetailsService {
        	  String role_sql="SELECT  bpm_role_type_name FROM "+ServiceConstant.SCHEMA+".BPM_ROLE_MAPPING mapping left join " +
        	  		" "+ServiceConstant.SCHEMA+".BPM_ROLE_TYPE role_type on mapping.bpm_role_type_id=role_type.bpm_role_type_id " +
        	  		" where mapping.bpm_role_id="+bpmrole.getBpmRoleId() ;
-       	  List list=synDomeBPMService.searchObject(role_sql);
+       	VResultMessage vresultMessage= synDomeBPMService.searchObject(role_sql);
+       	  List list=vresultMessage.getResultListObj();
        	  if(list!=null && list.size()>0){
        		  int role_size=list.size();
        		  for (int i = 0; i < role_size; i++) {

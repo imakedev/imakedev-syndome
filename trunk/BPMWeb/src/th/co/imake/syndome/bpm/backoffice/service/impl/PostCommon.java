@@ -14,6 +14,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import th.co.imake.syndome.bpm.xstream.common.Pagging;
+import th.co.imake.syndome.bpm.xstream.common.VMessage;
 import th.co.imake.syndome.bpm.xstream.common.VResultMessage;
 import th.co.imake.syndome.bpm.xstream.common.VServiceXML;
 
@@ -32,8 +33,10 @@ public class PostCommon {
 			@SuppressWarnings("rawtypes") Class[] className, String endPoint,
 			boolean isReturn) {
 		
-		//HttpPost httppost = new HttpPost("http://localhost:3000/v1/" + endPoint);
-		HttpPost httppost = new HttpPost("http://localhost:8080/BPMServices/rest/"+endPoint);
+		
+		boolean haveError=false;
+	 HttpPost httppost = new HttpPost("http://localhost:3000/v1/" + endPoint);
+	//HttpPost httppost = new HttpPost("http://localhost:8080/BPMServices/rest/"+endPoint);
 
 		// HttpPost httppost = new
 		// HttpPost("http://10.0.20.27:3000/v1/"+endPoint);
@@ -78,17 +81,24 @@ public class PostCommon {
 		// HttpClient httpclient = HttpClients.createDefault();// new
 		// DefaultHttpClient();
 		VResultMessage vresultMessage = null;
+		VMessage vmessage=new VMessage();
+		String  msgCode="";
+		String  msgDesc="";
+		//CloseableHttpClient httpClient = HttpClientBuilder.create().setProxy(proxy).build(
 		CloseableHttpClient httpclient = HttpClients.createDefault();// new
 	try{																// DefaultHttpClient();
+		
 		// HttpResponse response = null;
 		CloseableHttpResponse response = null;
 		HttpEntity resEntity = null;
 	
 		InputStream in = null;
 		try {
+		if(httppost!=null){
 			response = httpclient.execute(httppost);
 			resEntity = response.getEntity();
-
+		}
+		
 			if (isReturn) {
 				if (resEntity != null) {
 
@@ -113,14 +123,35 @@ public class PostCommon {
 							vresultMessage.setLastpage(lastpage + "");
 						}
 					} catch (IllegalStateException e) {
+						haveError=true;
+						 msgCode="error";
+							if(e.getCause()!=null)
+								msgDesc=e.getCause().getMessage();
+							else
+								msgDesc=e.getMessage();
+						vmessage.setException(e);
 						e.printStackTrace();
 					} catch (IOException e) {
+						haveError=true;
 						e.printStackTrace();
+						 msgCode="error";
+							if(e.getCause()!=null)
+								msgDesc=e.getCause().getMessage();
+							else
+								msgDesc=e.getMessage();
+						vmessage.setException(e);
 					} finally {
 						try {
 							if (in != null)
 								in.close();
 						} catch (IOException e) {
+							haveError=true;
+							 msgCode="error";
+								if(e.getCause()!=null)
+									msgDesc=e.getCause().getMessage();
+								else
+									msgDesc=e.getMessage();
+							vmessage.setException(e);
 							e.printStackTrace();
 						}
 					}
@@ -129,30 +160,83 @@ public class PostCommon {
 					EntityUtils.consume(resEntity);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
+					haveError=true;
+					 msgCode="error";
+						if(e.getCause()!=null)
+							msgDesc=e.getCause().getMessage();
+						else
+							msgDesc=e.getMessage();
+					vmessage.setException(e);
 					e.printStackTrace();
 				}
 			}
 		} catch (ClientProtocolException e) {
+			// System.out.println("xxxxxxxxxx");
+			haveError=true;
+			 msgCode="error";
+				if(e.getCause()!=null)
+					msgDesc=e.getCause().getMessage();
+				else
+					msgDesc=e.getMessage();
+			vmessage.setException(e);
 			e.printStackTrace();
 		} catch (IOException e) {
+		//	System.out.println("yyyyyyyyyyy");
+			haveError=true;
+			 msgCode="error";
+				if(e.getCause()!=null)
+					msgDesc=e.getCause().getMessage();
+				else
+					msgDesc=e.getMessage();
+			vmessage.setException(e);
 			e.printStackTrace();
 		} finally {
 			try {
 				response.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
+				haveError=true;
+				 msgCode="error";
+					if(e.getCause()!=null)
+						msgDesc=e.getCause().getMessage();
+					else
+						msgDesc=e.getMessage();
+				vmessage.setException(e);
 				e.printStackTrace();
 			}
+			//System.out.println(" finallllxxxxxxxxxx");
 		}
-	 } finally {
+	 }  
+	finally {
          try {
+        	//httpclient.getConnectionManager().shutdown();
 			httpclient.close();
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			haveError=true;
+			 msgCode="error";
+				if(e.getCause()!=null)
+					msgDesc=e.getCause().getMessage();
+				else
+					msgDesc=e.getMessage();
+			vmessage.setException(e);
 			e.printStackTrace();
 		}
+       // System.out.println(" finalllllllllll"+haveError);
+         if(haveError){
+     		vresultMessage =new VResultMessage();
+     		vmessage.setMsgCode(msgCode);
+     		vmessage.setMsgDesc(msgDesc);
+     		vresultMessage.setResultMessage(vmessage); 
+     		return vresultMessage;
+     	}
      }
-		// httpclient.getConnectionManager().shutdown();
+	/*
+	 * 
+	 */
+	  // System.out.println("ccccccccccccccccc");
+		 // httpclient.getConnectionManager().shutdown();
 		return vresultMessage;
 	}
 
