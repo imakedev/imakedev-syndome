@@ -13,13 +13,22 @@ import th.co.imake.syndome.bpm.xstream.common.VResultMessage;
 public interface SynDomeBPMService {
 	// PstBreakDown
 	@SuppressWarnings("rawtypes")
-	public List searchObject(String query);
+	/*public List searchObject(String query);
 	public int executeQuery(String[] query);
 	public int executeQuery(String[] query,List<String[]> values);
-	public int executeQueryUpdate(String[] queryDelete,String[] queryUpdate);
-		 
-	//public int executeQueryDelete(String[] query);
-	
+	public int executeQueryUpdate(String[] queryDelete,String[] queryUpdate);*/
+	public VResultMessage searchObject(String query);
+	public VResultMessage executeQuery(String[] query);
+	public VResultMessage executeQuery(String[] query,List<String[]> values);
+	public VResultMessage executeQueryUpdate(String[] queryDelete,String[] queryUpdate);
+	 
+	public VResultMessage searchServices(String bccNo) ;
+	//public int executeQueryDelete(String[] query); 
+	public VResultMessage searchTodoList(String serviceType,String serviceStatus,String username,String role,String page,String pageG,String isStore,String type,String key_job,String BTDL_CREATED_TIME);
+	public VResultMessage genPMMA(String duedate,String username,String BPMJ_NO,int pm_amount,int pm_year);
+	public VResultMessage getReportSO(String start_date,String end_date);
+	public VResultMessage getReportDeptStatus(String start_date,String end_date);
+	public VResultMessage getReportPMMA(String start_date,String end_date,String viewBy);
 	
 	// User
 	public abstract VResultMessage searchUser(
@@ -33,6 +42,6 @@ public interface SynDomeBPMService {
 	public abstract th.co.imake.syndome.bpm.xstream.User findUserById(String long1);
 	
 	//public String getRunningNo(String module);
-	public abstract String getRunningNo(String module,String format_year_month_day,String digit,String local);
+	public abstract VResultMessage getRunningNo(String module,String format_year_month_day,String digit,String local);
 	
 }
