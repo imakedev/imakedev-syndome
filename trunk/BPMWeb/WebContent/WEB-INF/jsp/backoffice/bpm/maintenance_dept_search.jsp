@@ -33,7 +33,8 @@ function goNext(){
 	}
 } 
 function goToPage(){ 
-	$("#pageNo").val(document.getElementById("breakdownPageSelect").value);
+//	$("#pageNo").val(document.getElementById("breakdownPageSelect").value);
+	checkWithSet("pageNo",$("#breakdownPageSelect").val());
 	//doAction('search','0');
 }
 function renderPageSelect(){
@@ -46,7 +47,7 @@ function renderPageSelect(){
 	}
 	pageStr=pageStr+"</select>"; 
 	$("#pageElement").html(pageStr);
-	document.getElementById("breakdownPageSelect").value=$("#pageNo").val();
+	checkWithSet("pageSelect",$("#pageNo").val());
 }
 function confirmDelete(mode,id){
 	$( "#dialog-confirmDelete" ).dialog({
@@ -95,7 +96,16 @@ function searchPstDepartMent(){
 	PSTAjax.searchObject(query,{
 		callback:function(data){
 			//alert(data)
-			
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			//var str="<div align=\"left\" style=\"padding-bottom: 4px;width:1070px\"> <a class=\"btn\" onclick=\"showForm('add','0')\"><i class=\"icon-plus-sign\"></i>&nbsp;<span style=\"font-weight: normal;\">Add</span></a></div>"+
 			var str="	  <table class=\"table table-striped table-bordered table-condensed\" border=\"1\" style=\"font-size: 12px\"> "+
 			        "	<thead> 	"+
@@ -129,7 +139,7 @@ function searchPstDepartMent(){
 			   }
 			        str=str+  " </tbody>"+
 					   "</table> "; 
-			$("#search_section").html(str);
+			$("#search_section_dept").html(str);
 		}
 	}); 
 }
@@ -182,7 +192,7 @@ function searchPstDepartMent(){
 	    					</span>&nbsp;|&nbsp;<a onclick="goNext()">Next</a>&nbsp;<a class="btn btn-primary" onclick="searchPstDepartMent()"><i class="icon-search icon-white"></i>&nbsp;Search</a></td>
 	    					</tr>
 	    					</tbody></table>
-	    					<div  id="search_section">
+	    					<div  id="search_section_dept">
 	 							 
     						</div>
 		

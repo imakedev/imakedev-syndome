@@ -13,11 +13,21 @@ function getSLA(){
 	}
 	$("#user_title").html("User Management ("+function_message+")");
   if(isEdit){ 
-	  var query="SELECT id,username,password,firstName,lastName ,email,mobile,BPM_ROLE_NAME,role.BPM_ROLE_ID from "+SCHEMA_G+".user left join "+SCHEMA_G+".BPM_ROLE role "+
+	  var query="SELECT id,username,password,firstName,lastName ,email,mobile,BPM_ROLE_NAME,role.BPM_ROLE_ID,detail from "+SCHEMA_G+".user left join "+SCHEMA_G+".BPM_ROLE role "+
 		 " on user.BPM_ROLE_ID=role.BPM_ROLE_ID  where user.id=${id}";
 	  var BPM_ROLE_ID="0";
 	   SynDomeBPMAjax.searchObject(query,{
 			callback:function(data){ 
+				if(data.resultMessage.msgCode=='ok'){
+					data=data.resultListObj;
+				}else{// Error Code
+					//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+					  bootbox.dialog(data.resultMessage.msgDesc,[{
+						    "label" : "Close",
+						     "class" : "btn-danger"
+					 }]);
+					 return false;
+				}
 				if(data!=null && data.length>0){
 					$("#username").val(data[0][1]);
 					$("#password").val(data[0][2]);
@@ -25,7 +35,8 @@ function getSLA(){
 					$("#lastName").val(data[0][4]);
 					$("#email").val(data[0][5]); 
 					$("#mobile").val(data[0][6]); 
-					$("#role").val(data[0][8]);  
+					$("#role").val(data[0][8]);
+					$("#detail").val(data[0][9]);
 					if(data[0][8]!=null)
 						BPM_ROLE_ID=data[0][8];
 					//$("#position").val(data[0][7]);
@@ -44,6 +55,16 @@ function renderRoleSelect(BPM_ROLE_ID){
 	 //alert("BPM_ROLE_ID->"+BPM_ROLE_ID)
 	 SynDomeBPMAjax.searchObject(query,{
 			callback:function(data2){ 
+				if(data2.resultMessage.msgCode=='ok'){
+					data2=data2.resultListObj;
+				}else{// Error Code
+					//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+					  bootbox.dialog(data2.resultMessage.msgDesc,[{
+						    "label" : "Close",
+						     "class" : "btn-danger"
+					 }]);
+					 return false;
+				}
 				if(data2!=null && data2.length>0){ 
 					<%-- --%>
 					var pageStr="<select name=\"roleSelect\" id=\"roleSelect\"  style=\"width: 205px\">"; 
@@ -68,6 +89,8 @@ function doUserAction(){
 	 var lastName=jQuery.trim($("#lastName").val());
 	 var email=jQuery.trim($("#email").val());
 	 var mobile=jQuery.trim($("#mobile").val());
+	 var detail=jQuery.trim($("#detail").val());
+	 
 	 var role_id=$( "#roleSelect option:selected" ).val();
 	// var position=jQuery.trim($("#position").val());
 	 
@@ -97,9 +120,9 @@ function doUserAction(){
 		 return false;
 	 }
 	var querys=[];
-	var query="insert into "+SCHEMA_G+".user set username=?, password=?,firstName=?,lastName=?,email=?,mobile=?,enabled=1,type=0,BPM_ROLE_ID="+role_id;
+	var query="insert into "+SCHEMA_G+".user set username=?, password=?,firstName=?,lastName=?,email=?,mobile=?,detail=?,enabled=1,type=0,BPM_ROLE_ID="+role_id;
 	if($("#mode").val()=='edit'){
-		 query="update "+SCHEMA_G+".user set username=?, password=?,firstName=?,lastName=?,email=?,mobile=?,BPM_ROLE_ID="+role_id+" where id=${id}";
+		 query="update "+SCHEMA_G+".user set username=?, password=?,firstName=?,lastName=?,email=?,mobile=?,detail=?,BPM_ROLE_ID="+role_id+" where id=${id}";
 	}
 	querys.push(query); 
 	var list_values=[];
@@ -110,11 +133,22 @@ function doUserAction(){
 		values.push(lastName);
 		values.push(email);
 		values.push(mobile);
+		values.push(detail);
 		//values.push(position);
 		
 		list_values.push(values);
 	SynDomeBPMAjax.executeQueryWithValues(querys,list_values,{
 			callback:function(data){ 
+				if(data.resultMessage.msgCode=='ok'){
+					data=data.updateRecord;
+				}else{// Error Code
+					//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+					  bootbox.dialog(data.resultMessage.msgDesc,[{
+						    "label" : "Close",
+						     "class" : "btn-danger"
+					 }]);
+					 return false;
+				}
 				if(data!=0){
 					loadDynamicPage("dispatcher/page/user_search");
 				}
@@ -183,6 +217,12 @@ function doUserAction(){
     					<td width="25%" align="right"><span style="font-size: 13px;padding: 15px">Mobile :</span></td>
     					<td width="75%" colspan="2"> 
     					<input type="text" name="mobile" id="mobile" style="height: 30;"/>
+    					</td>
+    				</tr> 
+    				<tr valign="middle">
+    					<td width="25%" align="right"><span style="font-size: 13px;padding: 15px">Detail :</span></td>
+    					<td width="75%" colspan="2"> 
+    					<input type="text" name="detail" id="detail" style="height: 30;"/>
     					</td>
     				</tr> 
     				<!-- <tr valign="middle">

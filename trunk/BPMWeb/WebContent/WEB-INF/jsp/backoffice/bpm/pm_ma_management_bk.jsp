@@ -306,7 +306,8 @@ function goNext(){
 	}
 } 
 function goToPage(){ 
-	$("#pageNo").val(document.getElementById("pageSelect").value);
+	//$("#pageNo").val(document.getElementById("pageSelect").value);
+	checkWithSet("pageNo",$("#pageSelect").val());
 //	doAction('search','0');
 	//searchItemList($("#pageNo").val());
 }
@@ -1129,7 +1130,7 @@ function doSaveDraftAction(){
     					  		 	<tr style="height: 30px;">
     					   		<td width="100%" colspan="3" align="left">
     					   				<span style="text-decoration: underline;">
-    					   				   อุปกรเสริม	
+    					   				   อุปกรณ์เสริม	
     					   				</span>&nbsp;&nbsp;<input type="radio"> สายไฟ
     					   		</td>
     					   		 

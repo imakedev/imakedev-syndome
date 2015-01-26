@@ -13,6 +13,13 @@ background	:#e5e5e5;
 <script>
 $(document).ready(function() { 
 	searchUser("1");
+	$("#user_search").keypress(function(event) {
+		  if ( event.which == 13 ) {
+		     event.preventDefault();
+		     searchUser('1')
+		   } 
+		});
+
 });
 function goPrev(){
 	if($("#pageNo").val()!='1'){
@@ -30,8 +37,9 @@ function goNext(){
 	}
 } 
 function goToPage(){ 
-	$("#pageNo").val(document.getElementById("employeeWorkMappingPageSelect").value);
-//	doAction('search','0');
+	//$("#pageNo").val(document.getElementById("employeeWorkMappingPageSelect").value);
+	checkWithSet("pageNo",$("#employeeWorkMappingPageSelect").val());
+	//	doAction('search','0');
 	searchUser($("#pageNo").val());
 }
 function renderPageSelect(){
@@ -44,7 +52,9 @@ function renderPageSelect(){
 	}
 	pageStr=pageStr+"</select>"; 
 	$("#pageElement").html(pageStr);
-	document.getElementById("employeeWorkMappingPageSelect").value=$("#pageNo").val();
+	checkWithSet("employeeWorkMappingPageSelect",$("#pageNo").val());
+   // $("#employeeWorkMappingPageSelect").val($("#pageNo").val());
+    //document.getElementById("employeeWorkMappingPageSelect").value=$("#pageNo").val();
 }
 function confirmDelete(id){
 	$( "#dialog-confirmDelete" ).dialog({
@@ -68,6 +78,16 @@ function doAction(id){
 	querys.push(query); 
 	SynDomeBPMAjax.executeQuery(querys,{
 		callback:function(data){ 
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.updateRecord;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			if(data!=0){
 				searchUser("1"); 
 			}
@@ -76,15 +96,28 @@ function doAction(id){
 } 
 function searchUser(_page){  
 	$("#pageNo").val(_page); 
+	
+	var user_search=jQuery.trim($("#user_search").val().replace(/'/g,"''"));
 	var query="SELECT id,username,firstName,lastName ,email,mobile,BPM_ROLE_NAME from "+SCHEMA_G+".user left join "+SCHEMA_G+".BPM_ROLE role "+
 	 " on user.BPM_ROLE_ID=role.BPM_ROLE_ID "; 
 	 
+	if(user_search.length>0)
+		query=query+" where  concat(username,firstName,lastName,email,mobile)   like '%"+user_search+"%' ";
 	var limitRow=(_page>1)?((_page-1)*_perpageG):0; 
 	var queryObject="  "+query+"   limit "+limitRow+", "+_perpageG;
 	var queryCount=" select count(*) from (  "+query+" ) as x";
 	SynDomeBPMAjax.searchObject(queryObject,{
 		callback:function(data){
-			  
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			var str="	  <table class=\"table table-striped table-bordered table-condensed\" border=\"1\" style=\"font-size: 12px\"> "+
 			        "	<thead> 	"+
 			        "  		<tr> "+
@@ -127,11 +160,22 @@ function searchUser(_page){
 			   }
 			        str=str+  " </tbody>"+
 					   "</table> "; 
-			$("#search_section").html(str);
+			$("#search_section_user").html(str);
 		}
 	}); 
+	/*
 	SynDomeBPMAjax.searchObject(queryCount,{
 		callback:function(data){
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			//alert(data)
 			//alert(calculatePage(_perpageG,data))
 			var pageCount=calculatePage(_perpageG,data);
@@ -139,6 +183,7 @@ function searchUser(_page){
 			renderPageSelect();
 		}
 	});
+	*/
 } 
 </script>
 <div id="dialog-confirmDelete" title="Delete User" style="display: none;background: ('images/ui-bg_highlight-soft_75_cccccc_1x100.png') repeat-x scroll 50% 50% rgb(204, 204, 204)">
@@ -158,7 +203,13 @@ function searchUser(_page){
 	    					<tbody>
 	    					<tr>
 	    					<td align="left" width="70%">  
+	    					<%--  
 	    					<span><strong>User</strong></span>
+	    					--%>
+	    					<span style="padding-left: 20px;font-size: 13px;">ระบุ key word</span> 
+									<span style="padding: 5px;">
+										<input id="user_search" type="text" style="height: 30; width: 150px" />
+									</span>
 	    					</td><td align="right" width="30%"> 
 	    					</td>
 	    					</tr>
@@ -175,7 +226,7 @@ function searchUser(_page){
 	    					</td>
 	    					</tr>
 	    					</tbody></table>  
-	    					<div  id="search_section"> 
+	    					<div  id="search_section_user"> 
     						</div> 
       </div>
       </fieldset> 

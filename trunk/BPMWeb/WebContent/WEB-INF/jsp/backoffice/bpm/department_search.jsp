@@ -30,7 +30,8 @@ function goNext(){
 	}
 } 
 function goToPage(){ 
-	$("#pageNo").val(document.getElementById("pageSelect").value);
+	//$("#pageNo").val(document.getElementById("pageSelect").value);
+	checkWithSet("pageNo",$("#pageSelect").val());
 //	doAction('search','0');
 	searchDepartment($("#pageNo").val());
 }
@@ -44,7 +45,7 @@ function renderPageSelect(){
 	}
 	pageStr=pageStr+"</select>"; 
 	$("#pageElement").html(pageStr);
-	document.getElementById("pageSelect").value=$("#pageNo").val();
+	checkWithSet("pageSelect",$("#pageNo").val());
 }
 function confirmDelete(id){
 	$( "#dialog-confirmDelete" ).dialog({
@@ -68,6 +69,16 @@ function doAction(id){
 	querys.push(query); 
 	SynDomeBPMAjax.executeQuery(querys,{
 		callback:function(data){ 
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.updateRecord;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			if(data!=0){
 				searchDepartment("1"); 
 			}
@@ -84,7 +95,16 @@ function searchDepartment(_page){
 	var queryCount=" select count(*) from (  "+query+" ) as x";
 	SynDomeBPMAjax.searchObject(queryObject,{
 		callback:function(data){
-			  
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			var str="	  <table class=\"table table-striped table-bordered table-condensed\" border=\"1\" style=\"font-size: 12px\"> "+
 			        "	<thead> 	"+
 			        "  		<tr> "+
@@ -105,7 +125,7 @@ function searchDepartment(_page){
 				        "    	<td style=\"text-align: left;\">"+((data[i][4]!=null)?data[i][4]:"")+"&nbsp;</td>  "+
 				        "    	<td style=\"text-align: center;\">"+  
 				        "    	<i title=\"Edit\" onclick=\"loadDynamicPage('dispatcher/page/department_management?bdeptId="+data[i][0]+"&mode=edit')\" style=\"cursor: pointer;\" class=\"icon-edit\"></i>&nbsp;&nbsp;"+
-				        "    	<i title=\"Delete\" onclick=\"confirmDelete('"+data[i][0]+"')\" style=\"cursor: pointer;\" class=\"icon-trash\"></i>"+
+				     //   "    	<i title=\"Delete\" onclick=\"confirmDelete('"+data[i][0]+"')\" style=\"cursor: pointer;\" class=\"icon-trash\"></i>"+
 				        "    	</td> "+
 				        "  	</tr>  ";
 				   }
@@ -121,11 +141,21 @@ function searchDepartment(_page){
 			   }
 			        str=str+  " </tbody>"+
 					   "</table> "; 
-			$("#search_section").html(str);
+			$("#search_section_department").html(str);
 		}
 	}); 
 	SynDomeBPMAjax.searchObject(queryCount,{
 		callback:function(data){
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			//alert(data)
 			//alert(calculatePage(_perpageG,data))
 			var pageCount=calculatePage(_perpageG,data);
@@ -169,7 +199,7 @@ function searchDepartment(_page){
 	    					</td>
 	    					</tr>
 	    					</tbody></table>  
-	    					<div  id="search_section"> 
+	    					<div  id="search_section_department"> 
     						</div> 
       </div>
       </fieldset> 

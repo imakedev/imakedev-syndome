@@ -18,6 +18,16 @@ function getRole(){
 	var query="SELECT BPM_ROLE_ID,BPM_ROLE_NAME,BPM_ROLE_DETAIL,BPM_ORDER FROM "+SCHEMA_G+".BPM_ROLE where BPM_ROLE_ID=${bpmRoleId}";
 	SynDomeBPMAjax.searchObject(query,{
 		callback:function(data){ 
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			if(data!=null && data.length>0){
 				//alert(data)
 				$("#bpmRoleName").val(data[0][1]);
@@ -66,7 +76,17 @@ function doRoleAction(){
 		alert(query_max);
 		SynDomeBPMAjax.searchObject(query_max,{
 			callback:function(data){ 
-				alert(data);
+				if(data.resultMessage.msgCode=='ok'){
+					data=data.resultListObj;
+				}else{// Error Code
+					//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+					  bootbox.dialog(data.resultMessage.msgDesc,[{
+						    "label" : "Close",
+						     "class" : "btn-danger"
+					 }]);
+					 return false;
+				}
+				//alert(data);
 				if(data!=null){
 					alert(data);
 					pbmOrder=data;
@@ -82,6 +102,17 @@ function doRoleAction(){
  function executeRoleManagement(querys,list_values){
 	 SynDomeBPMAjax.executeQueryWithValues(querys,list_values,{
 			callback:function(data){ 
+				
+				if(data.resultMessage.msgCode=='ok'){
+					data=data.updateRecord;
+				}else{// Error Code
+					//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+					  bootbox.dialog(data.resultMessage.msgDesc,[{
+						    "label" : "Close",
+						     "class" : "btn-danger"
+					 }]);
+					 return false;
+				}
 				if(data!=0){
 					loadDynamicPage("setting/page/role_search");
 				}

@@ -55,6 +55,16 @@ function getDeliveryTran(){
 		" FROM "+SCHEMA_G+".BPM_DELIVERY_TRAN   where BSO_ID=${bsoId} ";
 	  SynDomeBPMAjax.searchObject(query,{
 			callback:function(data){ 
+				if(data.resultMessage.msgCode=='ok'){
+					data=data.resultListObj;
+				}else{// Error Code
+					//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+					  bootbox.dialog(data.resultMessage.msgDesc,[{
+						    "label" : "Close",
+						     "class" : "btn-danger"
+					 }]);
+					 return false;
+				}
 				if(data!=null && data.length>0){ 
 					var BDT_CUST_NAME=data[0][1]!=null?data[0][1]:"";  $("#BDT_CUST_NAME").val(BDT_CUST_NAME);
 					var BDT_DOC_ATTACH_NAME=data[0][2]!=null?data[0][2]:"";// $("#BDT_DOC_ATTACH_NAME").val(BDT_DOC_ATTACH_NAME);
@@ -72,6 +82,16 @@ function getDeliveryTran(){
 					querys.push(query_insert); 
 					SynDomeBPMAjax.executeQuery(querys,{
 						callback:function(data){ 
+							if(data.resultMessage.msgCode=='ok'){
+								data=data.updateRecord;
+							}else{// Error Code
+								//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+								  bootbox.dialog(data.resultMessage.msgDesc,[{
+									    "label" : "Close",
+									     "class" : "btn-danger"
+								 }]);
+								 return false;
+							}
 							if(data!=0){  
 								//searchDeliveryInstallation("1"); 
 							}
@@ -189,6 +209,16 @@ function getSaleOrder(){
 	   
 	   SynDomeBPMAjax.searchObject(query,{
 			callback:function(data){ 
+				if(data.resultMessage.msgCode=='ok'){
+					data=data.resultListObj;
+				}else{// Error Code
+					//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+					  bootbox.dialog(data.resultMessage.msgDesc,[{
+						    "label" : "Close",
+						     "class" : "btn-danger"
+					 }]);
+					 return false;
+				}
 				if(data!=null && data.length>0){ 
 					$("#bsoTypeNo").val(data[0][26]);
 					var BSO_ID=data[0][0]!=null?data[0][0]:""; 
@@ -307,6 +337,7 @@ function getSaleOrder(){
 					
 					var BSO_WARRANTY_EXT="";
 					var BSO_WARRANTY_VALUE='0';
+					/*
 					if(BSO_WARRANTY.length>0){
 						BSO_WARRANTY_VALUE=BSO_WARRANTY;
 						if(BSO_WARRANTY!='2' && BSO_WARRANTY!='3'){
@@ -316,6 +347,8 @@ function getSaleOrder(){
 					}else{
 						BSO_WARRANTY_VALUE=BSO_WARRANTY; 
 					} 
+					*/
+					BSO_WARRANTY_VALUE=BSO_WARRANTY; 
 					$('input[name="BSO_WARRANTY"][value="' + BSO_WARRANTY_VALUE + '"]').prop('checked', true);
 					$("#BSO_WARRANTY_EXT").val(BSO_WARRANTY_EXT);
 					
@@ -385,6 +418,16 @@ function getSaleOrder(){
 					  SynDomeBPMAjax.searchObject(query,{
 							callback:function(data2){  
 								//alert(data2)
+								if(data2.resultMessage.msgCode=='ok'){
+									data2=data2.resultListObj;
+								}else{// Error Code
+									//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+									  bootbox.dialog(data2.resultMessage.msgDesc,[{
+										    "label" : "Close",
+										     "class" : "btn-danger"
+									 }]);
+									 return false;
+								}
 								for(var i=0;i<data2.length;i++){ 
 									sla_select=sla_select+"<option value=\""+data2[i][1]+"\">"+data2[i][1]+"</option>";
 								}
@@ -406,6 +449,16 @@ function getSaleOrder(){
   }else{
 	  SynDomeBPMAjax.getRunningNo("SALE_ORDER_BY_YEAR","y","5","th",{
 			callback:function(data){  
+				if(data.resultMessage.msgCode=='ok'){
+					data=data.resultMessage.msgDesc;
+				}else{// Error Code
+					//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+					  bootbox.dialog(data.resultMessage.msgDesc,[{
+						    "label" : "Close",
+						     "class" : "btn-danger"
+					 }]);
+					 return false;
+				}
 				if(data!=null && data.length>0){
 					$("#bsoTypeNo").val(data);
 					var querys=[];  
@@ -415,11 +468,31 @@ function getSaleOrder(){
 					querys.push(query); 
 					SynDomeBPMAjax.executeQuery(querys,{
 						callback:function(data){ 
+							if(data.resultMessage.msgCode=='ok'){
+								data=data.updateRecord;
+							}else{// Error Code
+								//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+								  bootbox.dialog(data.resultMessage.msgDesc,[{
+									    "label" : "Close",
+									     "class" : "btn-danger"
+								 }]);
+								 return false;
+							}
 							if(data!=0){
 								query=" SELECT "+
 								   " BSO_ID , CUSCOD FROM "+SCHEMA_G+".BPM_SALE_ORDER where BSO_TYPE_NO='"+$("#bsoTypeNo").val()+"'";
 								  SynDomeBPMAjax.searchObject(query,{
 										callback:function(data2){ 
+											if(data2.resultMessage.msgCode=='ok'){
+												data2=data2.resultListObj;
+											}else{// Error Code
+												//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+												  bootbox.dialog(data2.resultMessage.msgDesc,[{
+													    "label" : "Close",
+													     "class" : "btn-danger"
+												 }]);
+												 return false;
+											}
 											loadDynamicPage('dispatcher/page/delivery_install_management?bsoId='+data2[0][0]+'&mode=edit');
 										}
 								  }); 
@@ -462,7 +535,8 @@ function goNext(){
 	}
 } 
 function goToPage(){ 
-	$("#pageNo").val(document.getElementById("pageSelect").value);
+	//$("#pageNo").val(document.getElementById("pageSelect").value);
+	checkWithSet("pageNo",$("#pageSelect").val());
 //	doAction('search','0');
 	searchItemList($("#pageNo").val());
 }
@@ -476,7 +550,7 @@ function renderPageSelect(){
 	}
 	pageStr=pageStr+"</select>"; 
 	$("#pageElement").html(pageStr);
-	document.getElementById("pageSelect").value=$("#pageNo").val();
+	checkWithSet("pageSelect",$("#pageNo").val());
 }
 function confirmDelete(cuscod,itemid){
 	$( "#dialog-confirmDelete" ).dialog({
@@ -502,6 +576,16 @@ function doAction(cuscod,itemid){
 	querys.push(query); 
 	SynDomeBPMAjax.executeQuery(querys,{
 		callback:function(data){ 
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.updateRecord;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			if(data!=0){
 				searchItemList("1"); 
 			}
@@ -510,18 +594,33 @@ function doAction(cuscod,itemid){
 } 
 function searchItemListByInstall(_page){
 	$("#pageNo").val(_page);
-	var query="SELECT product.ima_itemid,product.ima_itemname,mapping.serial,mapping.is_serial  FROM  "+SCHEMA_G+".BPM_SALE_PRODUCT_ITEM_MAPPING mapping left join  "+ 
+	var query="SELECT product.ima_itemid,product.ima_itemname,mapping.serial,mapping.is_serial ,trans.BIT_CHECK_STATUS FROM  "+SCHEMA_G+".BPM_SALE_PRODUCT_ITEM_MAPPING mapping left join  "+ 
 	" "+SCHEMA_G+".BPM_SALE_PRODUCT_ITEM item  "+
 	"on(  mapping.bso_id=item.bso_id and mapping.cuscod=item.cuscod  "+
-	"and mapping.ima_itemid=item.ima_itemid) left join  "+SCHEMA_G+".BPM_PRODUCT product "+
-	"on mapping.ima_itemid=product.ima_itemid  where item.BSO_ID=${bsoId}";
+	"and mapping.ima_itemid=item.ima_itemid and mapping.AUTO_K=item.AUTO_K) left join   "+SCHEMA_G+".BPM_PRODUCT product "+
+	// "and mapping.ima_itemid=item.ima_itemid  ) left join  "+SCHEMA_G+".BPM_PRODUCT product "+
+	"on mapping.ima_itemid=product.ima_itemid  "+
+	" left join "+SCHEMA_G+".BPM_INSTALLATION_TRAN  trans "+ 
+	" on (trans.BSO_ID=${bsoId} and trans.IMA_ItemID=mapping.IMA_ItemID and trans.SERIAL=mapping.SERIAL) "+
+	  " where item.BSO_ID=${bsoId}  ";
+	// " where item.BSO_ID=${bsoId} and mapping.IMA_ItemID like '9%'";
 	var limitRow=(_page>1)?((_page-1)*_perpageG):0; 
 	var queryObject="  "+query+"   limit "+limitRow+", "+_perpageG;
 	var queryCount=" select count(*) from (  "+query+" ) as x";
-	//alert(queryObject)
+	// alert(queryObject)
 	SynDomeBPMAjax.searchObject(queryObject,{
 		callback:function(data){
-			  
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
+			
 			var str="	  <table class=\"table table-striped table-bordered table-condensed\" border=\"1\" style=\"font-size: 12px\"> "+
 			        "	<thead> 	"+
 			        "  		<tr> "+
@@ -542,13 +641,17 @@ function searchItemListByInstall(_page){
 					     vat=$.formatNumber(data[i][6]+"", {format:"#,###.00", locale:"us"});
 					     grand_total=$.formatNumber(data[i][7]+"", {format:"#,###.00", locale:"us"});
 					     var serial=data[i][3]=='1'?data[i][2]:"ไม่ระบุ";
+					     var reviewed=data[i][4]=='2'?" [ตรวจสอบแล้ว]":"";
+					    
 					   str=str+ "  	<tr style=\"cursor: pointer;\">"+
 					   "  		<td style=\"text-align: left;\"> "+data[i][0]+" </td>"+     
-					   "  		<td style=\"text-align: left;\"> "+data[i][1]+" </td>"+
+					   "  		<td style=\"text-align: left;\"> "+data[i][1]+" "+reviewed+" </td>"+
 					   "  		<td style=\"text-align: left;\"> "+serial+" </td>"+   
-				        "    	<td style=\"text-align: center;\"> "+ 
-				        "	<i title=\"Edit\" onclick=\"loadDynamicPage('dispatcher/page/delivery_install_preview?bsoId=${bsoId}&mode=edit&state=${state}&requestor=${requestor}&ima_itemid="+data[i][0]+"&serial="+data[i][2]+"')\" style=\"cursor: pointer;\" class=\"icon-edit\"></i>&nbsp;&nbsp;"+
-				        "</td>  "+  
+				        "    	<td style=\"text-align: center;\"> ";
+				        
+				        if(data[i][0].indexOf('9')==0 && data[i][3]=='1')
+				        	 str=str+ "	<i title=\"Edit\" onclick=\"loadDynamicPage('dispatcher/page/delivery_install_preview?bsoId=${bsoId}&mode=edit&state=${state}&requestor=${requestor}&ima_itemid="+data[i][0]+"&serial="+data[i][2]+"')\" style=\"cursor: pointer;\" class=\"icon-edit\"></i>&nbsp;&nbsp;";
+				        str=str+  "</td>  "+  
 				        "  	</tr>  ";
 				   }
 				   
@@ -579,8 +682,19 @@ function searchItemListByInstall(_page){
 			$("#item_section").html(str);
 		}
 	}); 
+	/*
 	SynDomeBPMAjax.searchObject(queryCount,{
 		callback:function(data){ 
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			 if(data==0) 
 				 data=1;
 			//alert(calculatePage(_perpageG,data))
@@ -589,6 +703,7 @@ function searchItemListByInstall(_page){
 			renderPageSelect();
 		}
 	});
+	*/
 }
 function searchItemList(_page){  
 	$("#pageNo").val(_page);   
@@ -605,15 +720,29 @@ function searchItemList(_page){
 	          " ROUND(item.AMOUNT*item.PRICE_COST,2) AS SUM_PRICE_COST ,"+
 	        /*   "(select sum(ROUND(AMOUNT*PRICE_COST,2)) "+
 	          " from BPM_SALE_PRODUCT_ITEM where BSO_ID=item.BSO_ID ) as SUM_TOTAL_COST ,"+ */
-	          " item.cuscod "+
-		"FROM "+SCHEMA_G+".BPM_SALE_PRODUCT_ITEM  item left join "+SCHEMA_G+".BPM_PRODUCT product on item.IMA_ItemID=product.IMA_ItemID where item.BSO_ID=${bsoId}";
+	          " item.cuscod ,"+
+	          "  item.DETAIL , "+
+	          "  item.AUTO_K , "+
+	          "  item.IS_REPLACE , "+
+	          "  item.REPLACE_NAME  "+
+		"FROM "+SCHEMA_G+".BPM_SALE_PRODUCT_ITEM  item left join "+SCHEMA_G+".BPM_PRODUCT product "+ 
+		" on item.IMA_ItemID=product.IMA_ItemID where item.BSO_ID=${bsoId}  and item.IMA_ItemID not in('900002','900004','90100002' )";
 	var limitRow=(_page>1)?((_page-1)*_perpageG):0; 
 	var queryObject="  "+query+"   limit "+limitRow+", "+_perpageG;
 	var queryCount=" select count(*) from (  "+query+" ) as x";
 	//alert(queryObject)
 	SynDomeBPMAjax.searchObject(queryObject,{
 		callback:function(data){
-			  
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			var str="	  <table class=\"table table-striped table-bordered table-condensed\" border=\"1\" style=\"font-size: 12px\"> "+
 			        "	<thead> 	"+
 			        "  		<tr> "+
@@ -630,13 +759,20 @@ function searchItemList(_page){
 				   var vat=0;
 				   var grand_total=0;
 				   for(var i=0;i<data.length;i++){ 
+					   var IS_REPLACE=data[i][13]!=null?data[i][13]:"0";
+					     var REPLACE_NAME=data[i][14]!=null?data[i][14]:"";
+					   var name ="";
+					     if(IS_REPLACE=='1'){
+					    	 name=REPLACE_NAME;
+					     }else
+					    	 name=data[i][1];
 					     total=$.formatNumber(data[i][5]+"", {format:"#,###.00", locale:"us"});
 					     vat=$.formatNumber(data[i][6]+"", {format:"#,###.00", locale:"us"});
 					     grand_total=$.formatNumber(data[i][7]+"", {format:"#,###.00", locale:"us"});
 					   str=str+ "  	<tr style=\"cursor: pointer;\">"+
 					   "  		<td style=\"text-align: left;\"> "+data[i][0]+" </td>"+     
-					   "  		<td style=\"text-align: left;\"> "+data[i][1]+" </td>"+    
-				        "    	<td style=\"text-align: center;\"><span style=\"text-decoration: underline;\" onclick=\"showItem('"+data[i][10]+"','"+data[i][0]+"')\">"+data[i][2]+"</span></td>  "+  
+					   "  		<td style=\"text-align: left;\"> "+name+" "+(data[i][11]!=null?("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+data[i][11]):"")+"</td>"+
+				        "    	<td style=\"text-align: center;\"><span style=\"text-decoration: underline;\" onclick=\"showItem('"+data[i][10]+"','"+data[i][0]+"','"+data[i][12]+"')\">"+data[i][2]+"</span></td>  "+  
 				     //    "    	<td style=\"text-align: right;\">"+((data[i][3]!=null)? $.formatNumber(data[i][3]+"", {format:"#,###.00", locale:"us"}):"")+"</td>  "+
 				      //   "    	<td style=\"text-align: right;\">"+((data[i][4]!=null)? $.formatNumber(data[i][4]+"", {format:"#,###.00", locale:"us"}):"")+"</td>  "+
 				        "  	</tr>  ";
@@ -669,8 +805,19 @@ function searchItemList(_page){
 			$("#item_section").html(str);
 		}
 	}); 
+	/*
 	SynDomeBPMAjax.searchObject(queryCount,{
 		callback:function(data){ 
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			 if(data==0) 
 				 data=1;
 			//alert(calculatePage(_perpageG,data))
@@ -679,8 +826,9 @@ function searchItemList(_page){
 			renderPageSelect();
 		}
 	});
+	*/
 } 
-function showItem(cuscod,itemId){
+function showItem(cuscod,itemId,auto){
 	
 	var query="  SELECT "+
 	" mapping.BSO_ID,"+
@@ -693,9 +841,20 @@ function showItem(cuscod,itemId){
 	"  left join BPM_PRODUCT product"+
 	"  on mapping.IMA_ItemID=product.IMA_ItemID"+
 	"  where mapping.bso_id=${bsoId} and mapping.cuscod='"+cuscod+"' and mapping.IMA_ItemID='"+itemId+"' "+
+	" and mapping.AUTO_K="+auto+
 	"   order by  mapping.SERIAL asc "; 
 	SynDomeBPMAjax.searchObject(query,{
 		callback:function(data){
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			 role_ids=[];
 			if(data!=null && data.length>0){
 				var str="	  <table class=\"table table-striped table-bordered table-condensed\" border=\"1\" style=\"font-size: 12px\"> "+
@@ -734,7 +893,16 @@ function showTeam(){
 		" where user_hod.username='${username}' "; 
 	SynDomeBPMAjax.searchObject(query,{
 		callback:function(data){
-			 
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			if(data!=null && data.length>0){
 				var str="	  <table class=\"table table-striped table-bordered table-condensed\" border=\"1\" style=\"font-size: 12px\"> "+
 			    "	<thead> 	"+
@@ -807,6 +975,16 @@ function doAssignTeam(){
 	 querys.push(query); 
 	SynDomeBPMAjax.executeQuery(querys,{
 		callback:function(data){ 
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.updateRecord;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			if(data!=0){
 				showDialog(message_created);
 			}
@@ -822,6 +1000,16 @@ function doUpdateJob(btdl_type,btdl_state,owner,owner_type,message){
 	querys.push(query); 
 	SynDomeBPMAjax.executeQuery(querys,{
 			callback:function(data){ 
+				if(data.resultMessage.msgCode=='ok'){
+					data=data.updateRecord;
+				}else{// Error Code
+					//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+					  bootbox.dialog(data.resultMessage.msgDesc,[{
+						    "label" : "Close",
+						     "class" : "btn-danger"
+					 }]);
+					 return false;
+				}
 				if(data!=0){ 
 					 querys=[];   
 				 if(btdl_state!='wait_for_create_to_express' && btdl_state!='wait_for_stock'){
@@ -832,6 +1020,16 @@ function doUpdateJob(btdl_type,btdl_state,owner,owner_type,message){
 					querys.push(query); 
 					SynDomeBPMAjax.executeQuery(querys,{
 						callback:function(data){ 
+							if(data.resultMessage.msgCode=='ok'){
+								data=data.updateRecord;
+							}else{// Error Code
+								//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+								  bootbox.dialog(data.resultMessage.msgDesc,[{
+									    "label" : "Close",
+									     "class" : "btn-danger"
+								 }]);
+								 return false;
+							}
 							if(data!=0){
 								showDialog(message);
 							}
@@ -883,6 +1081,16 @@ function doSubmitSaleOrder(){
 			         " on dept.bdept_hdo_user_id=user.id where bdept_id=8) as hod_logistic	FROM dual ";
 	 SynDomeBPMAjax.searchObject(query_search,{
 			callback:function(data){ 
+				if(data.resultMessage.msgCode=='ok'){
+					data=data.resultListObj;
+				}else{// Error Code
+					//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+					  bootbox.dialog(data.resultMessage.msgDesc,[{
+						    "label" : "Close",
+						     "class" : "btn-danger"
+					 }]);
+					 return false;
+				}
 				if(data!=null && data.length>0){
 					var BSO_DELIVERY_TYPE=$("input[name=BSO_DELIVERY_TYPE]:checked" ).val();
 					//if(document.getElementById("bsoTypeCheck_1").checked){ // RFE
@@ -911,6 +1119,16 @@ function doSubmitSaleOrder(){
 				}
 				SynDomeBPMAjax.executeQuery(querys,{
 					callback:function(data){ 
+						if(data.resultMessage.msgCode=='ok'){
+							data=data.updateRecord;
+						}else{// Error Code
+							//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+							  bootbox.dialog(data.resultMessage.msgDesc,[{
+								    "label" : "Close",
+								     "class" : "btn-danger"
+							 }]);
+							 return false;
+						}
 						if(data!=0){
 							showDialog("Submit Sale Order.");
 						}
@@ -927,6 +1145,16 @@ function doUpdateState(btdl_type,btdl_state,owner,owner_type,message_duplicate,m
 	"BTDL_TYPE='"+btdl_type+"' and BTDL_STATE='"+btdl_state+"' and BTDL_OWNER='"+owner+"' and BTDL_OWNER_TYPE='"+owner_type+"'  ";
 	 SynDomeBPMAjax.searchObject(query,{
 			callback:function(data){ 
+				if(data.resultMessage.msgCode=='ok'){
+					data=data.resultListObj;
+				}else{// Error Code
+					//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+					  bootbox.dialog(data.resultMessage.msgDesc,[{
+						    "label" : "Close",
+						     "class" : "btn-danger"
+					 }]);
+					 return false;
+				}
 				if(data!=null && data.length>0){
 					showDialog(message_duplicate);
 				}else{
@@ -951,6 +1179,16 @@ function doUpdateState(btdl_type,btdl_state,owner,owner_type,message_duplicate,m
 					 querys.push(query); 
 					SynDomeBPMAjax.executeQuery(querys,{
 						callback:function(data){ 
+							if(data.resultMessage.msgCode=='ok'){
+								data=data.updateRecord;
+							}else{// Error Code
+								//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+								  bootbox.dialog(data.resultMessage.msgDesc,[{
+									    "label" : "Close",
+									     "class" : "btn-danger"
+								 }]);
+								 return false;
+							}
 							if(data!=0){
 								showDialog(message_created);
 							}
@@ -1170,6 +1408,16 @@ var querys=[];
 querys.push(query);  
 SynDomeBPMAjax.executeQuery(querys,{
 	callback:function(data){ 
+		if(data.resultMessage.msgCode=='ok'){
+			data=data.updateRecord;
+		}else{// Error Code
+			//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+			  bootbox.dialog(data.resultMessage.msgDesc,[{
+				    "label" : "Close",
+				     "class" : "btn-danger"
+			 }]);
+			 return false;
+		}
 		if(data!=0){
 			//alert(data);
 			loadDynamicPage('dispatcher/page/delivery_install_search');
@@ -1200,12 +1448,32 @@ SynDomeBPMAjax.executeQuery(querys,{
 		querys.push(query); 
 		SynDomeBPMAjax.executeQuery(querys,{
 				callback:function(data){ 
+					if(data.resultMessage.msgCode=='ok'){
+						data=data.updateRecord;
+					}else{// Error Code
+						//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+						  bootbox.dialog(data.resultMessage.msgDesc,[{
+							    "label" : "Close",
+							     "class" : "btn-danger"
+						 }]);
+						 return false;
+					}
 					if(data!=0){ 
 						 querys=[];  
 						 query="SELECT count(*) FROM "+SCHEMA_G+".BPM_TO_DO_LIST where ref_no='"+$("#bsoTypeNo").val()+"' "+
 							 " and btdl_owner_type='1' and btdl_hide='1'" ;
 						  SynDomeBPMAjax.searchObject(query,{
 								callback:function(data){ 
+									if(data.resultMessage.msgCode=='ok'){
+										data=data.resultListObj;
+									}else{// Error Code
+										//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+										  bootbox.dialog(data.resultMessage.msgDesc,[{
+											    "label" : "Close",
+											     "class" : "btn-danger"
+										 }]);
+										 return false;
+									}
 									var message_used=message;
 									if(data==0){ 
 										 query="update "+SCHEMA_G+".BPM_SALE_ORDER set BSO_STATE='Sale Order Closed', BSO_STATUS='1' where BSO_ID=${bsoId}";
@@ -1216,14 +1484,24 @@ SynDomeBPMAjax.executeQuery(querys,{
 									querys.push(query); 
 									SynDomeBPMAjax.executeQuery(querys,{
 										callback:function(data){ 
+											if(data.resultMessage.msgCode=='ok'){
+												data=data.updateRecord;
+											}else{// Error Code
+												//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+												  bootbox.dialog(data.resultMessage.msgDesc,[{
+													    "label" : "Close",
+													     "class" : "btn-danger"
+												 }]);
+												 return false;
+											}
 											if(data!=0){
 												bootbox.dialog(message_used,[{
 												    "label" : "Ok",
 												    "class" : "btn-primary",
 												    "callback": function() {
-												    	$("ul[class=nav] > li").removeClass("active"); 
-													    $("#monitor_job_link").addClass("active"); 
-												    	loadDynamicPage('dispatcher/page/monitor_job')
+												    //	$("ul[class=nav] > li").removeClass("active"); 
+													 //   $("#monitor_job_link").addClass("active"); 
+												    	loadDynamicPage('dispatcher/page/todolist')
 												    }
 												 }]); 
 											}
@@ -1235,18 +1513,54 @@ SynDomeBPMAjax.executeQuery(querys,{
 						    "label" : "Ok",
 						    "class" : "btn-primary",
 						    "callback": function() {
+						    	/*
 						    	$("ul[class=nav] > li").removeClass("active"); 
 							    $("#monitor_job_link").addClass("active"); 
 						    	loadDynamicPage('dispatcher/page/monitor_job')
+						    	*/
+						    	loadDynamicPage('dispatcher/page/todolist')
 						    }
 						 }]); 
 					} 
 				}});
  }
+ function doCheck(btdl_type,btdl_state,owner,owner_type,message){
+	 <c:if test="${state=='wait_for_supervisor_install_close'}">
+	   var queryCheck=""+ 
+		" SELECT count(*) as c0 FROM   BPM_SALE_PRODUCT_ITEM_MAPPING mapping where mapping.bso_id=${bsoId} and  mapping.IMA_ItemID like '9%' and mapping.IS_SERIAL='1' "+
+		" union  all "+
+		" SELECT count(*) as c0 FROM   BPM_INSTALLATION_TRAN tran where tran.bso_id=${bsoId} and tran.BIT_CHECK_STATUS='2' and tran.IMA_ItemID like '9%'   ";
+		 SynDomeBPMAjax.searchObject(queryCheck,{
+				callback:function(data){ 
+					if(data.resultMessage.msgCode=='ok'){
+						data=data.resultListObj;
+					}else{// Error Code
+						//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+						  bootbox.dialog(data.resultMessage.msgDesc,[{
+							    "label" : "Close",
+							     "class" : "btn-danger"
+						 }]);
+						 return false;
+					}  
+					 if(data[0]!=data[1]){
+						  bootbox.dialog("กรุณาตรวจสอบการติดตั้งให้ครบ",[{
+							    "label" : "Close",
+							     "class" : "btn-danger"
+						 }]);
+						 return false;
+					 }else{
+						 doCloseJob(btdl_type,btdl_state,owner,owner_type,message);
+					 }
+					}
+		     });
+	   </c:if>
+	   <c:if test="${state!='wait_for_supervisor_install_close'}">
+	     doCloseJob(btdl_type,btdl_state,owner,owner_type,message);
+	   </c:if>
+ }
  function doCloseJob(btdl_type,btdl_state,owner,owner_type,message){
 	   /*  alert($("#BSO_IS_DELIVERY").val());
-	    alert($("#BSO_IS_INSTALLATION").val()) */; 
-	   
+	    alert($("#BSO_IS_INSTALLATION").val()) */;  
 	    if($("#BSO_IS_DELIVERY").val()=='1' && $("#BSO_IS_INSTALLATION").val()=='1'){
 	    	checkForClose(btdl_type,btdl_state,owner,owner_type,message);
 	    }else{
@@ -1258,24 +1572,45 @@ SynDomeBPMAjax.executeQuery(querys,{
 			querys.push(query); 
 			SynDomeBPMAjax.executeQuery(querys,{
 					callback:function(data){ 
+						if(data.resultMessage.msgCode=='ok'){
+							data=data.updateRecord;
+						}else{// Error Code
+							//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+							  bootbox.dialog(data.resultMessage.msgDesc,[{
+								    "label" : "Close",
+								     "class" : "btn-danger"
+							 }]);
+							 return false;
+						}
 						if(data!=0){ 
 							 querys=[];   
 						 if(btdl_state!='wait_for_create_to_express' && btdl_state!='wait_for_stock'){
 							 if(btdl_state=='wait_for_supervisor_close')
-								 query="update "+SCHEMA_G+".BPM_SALE_ORDER set BSO_STATE='Sale Order Closed', BSO_STATUS='1' where BSO_ID=${bsoId}";
+								 query="update "+SCHEMA_G+".BPM_SALE_ORDER set BSO_STATE='Sale Order Closed', BSO_STATUS='1' , BSO_JOB_STATUS=6  where BSO_ID=${bsoId}";
 							 else
 								 query="update "+SCHEMA_G+".BPM_SALE_ORDER set BSO_STATE='"+btdl_state+"' where BSO_ID=${bsoId}"; 
 							querys.push(query); 
 							SynDomeBPMAjax.executeQuery(querys,{
 								callback:function(data){ 
+									if(data.resultMessage.msgCode=='ok'){
+										data=data.updateRecord;
+									}else{// Error Code
+										//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+										  bootbox.dialog(data.resultMessage.msgDesc,[{
+											    "label" : "Close",
+											     "class" : "btn-danger"
+										 }]);
+										 return false;
+									}
 									if(data!=0){
 										bootbox.dialog(message,[{
 										    "label" : "Ok",
 										    "class" : "btn-primary",
 										    "callback": function() {
-										    	$("ul[class=nav] > li").removeClass("active"); 
-											    $("#monitor_job_link").addClass("active"); 
-										    	loadDynamicPage('dispatcher/page/monitor_job')
+										    	//$("ul[class=nav] > li").removeClass("active"); 
+											    //$("#monitor_job_link").addClass("active"); 
+										    	//loadDynamicPage('dispatcher/page/monitor_job')
+										    	loadDynamicPage('dispatcher/page/todolist')
 										    }
 										 }]); 
 									}
@@ -1286,9 +1621,12 @@ SynDomeBPMAjax.executeQuery(querys,{
 								    "label" : "Ok",
 								    "class" : "btn-primary",
 								    "callback": function() {
+								    	/*
 								    	$("ul[class=nav] > li").removeClass("active"); 
 									    $("#monitor_job_link").addClass("active"); 
 								    	loadDynamicPage('dispatcher/page/monitor_job')
+								    	*/
+								    	loadDynamicPage('dispatcher/page/todolist')
 								    }
 								 }]); 
 						}else{
@@ -1296,9 +1634,12 @@ SynDomeBPMAjax.executeQuery(querys,{
 							    "label" : "Ok",
 							    "class" : "btn-primary",
 							    "callback": function() {
+							    	/*
 							    	$("ul[class=nav] > li").removeClass("active"); 
 								    $("#monitor_job_link").addClass("active"); 
 							    	loadDynamicPage('dispatcher/page/monitor_job')
+							    	*/
+							    	loadDynamicPage('dispatcher/page/todolist')
 							    }
 							 }]); 
 						} 
@@ -1335,7 +1676,7 @@ SynDomeBPMAjax.executeQuery(querys,{
            	 <strong id="delivery_install_title"></strong><input type="text" id="bsoTypeNo" style="height: 30px;width: 125px" readonly="readonly"/> 
            	
            	 <c:if test="${isExpressAccount}">
-           	 INV No. <input type="text" id="BSO_INV_NO" style="height: 30px;width: 125px" /> 
+           	 IV No. <input type="text" id="BSO_INV_NO" style="height: 30px;width: 125px" /> 
            	 </c:if>
            	  <c:if test="${isStoreAccount}">
            	<!--  RTE No. <input type="text" id="BSO_RFE_NO" style="height: 30px;width: 125px" /> -->
@@ -1361,9 +1702,25 @@ SynDomeBPMAjax.executeQuery(querys,{
             	INT No. <input type="text" id="BSO_INT_NO" readonly="readonly" style="height: 30px;width: 125px" />
             	</span>
             	<span id="invoice_form_element" style="padding-left: 10px;display: none">  
-            	INV No. <input type="text" id="BSO_EXPRESS_INV_NO"  readonly="readonly" style="height: 30px;width: 125px" />
+            	IV No. <input type="text" id="BSO_EXPRESS_INV_NO"  readonly="readonly" style="height: 30px;width: 125px" />
+            	</span>
+            	 <span id="score_form_element" style="padding-left: 10px;">  
+            	คะแนน: 
+            	<select style="width:48px">
+            		<option>1</option>
+            		<option>2</option>
+            		<option>3</option>
+            		<option>4</option>
+            		<option>5</option>
+            		<option>6</option>
+            		<option>7</option>
+            		<option>8</option>
+            		<option>9</option>
+            		<option>10</option>
+            	</select>
             	</span>
            	 <br></br>
+           	   
             	</div>
 			    <table border="0" width="100%" style="font-size: 12px">
 			    	<tr>
@@ -1948,7 +2305,7 @@ SynDomeBPMAjax.executeQuery(querys,{
 				 			<a class="btn btn-info"  onclick="loadDynamicPage('dispatcher/page/todolist')"><i class="icon-chevron-left icon-white"></i>&nbsp;<span style="color: white;font-weight: bold;">Back</span></a>
 				 		</td>
 				 		<td width="80%"> 
-				 		 <div align="center"> <a class="btn btn-primary"  onclick="doCloseJob('1','wait_for_supervisor_close','${username}','1','Sale Order Closed')"><i class="icon-ok icon-white"></i>&nbsp;<span style="color: white;font-weight: bold;">Close Job</span></a></div>
+				 		 <div align="center"> <a class="btn btn-primary"  onclick="doCheck('1','wait_for_supervisor_close','${username}','1','Sale Order Closed')"><i class="icon-ok icon-white"></i>&nbsp;<span style="color: white;font-weight: bold;">Close Job</span></a></div>
     					 
     					 
     					</td>
