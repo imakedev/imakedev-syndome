@@ -32,6 +32,16 @@ function getSLA(){
 	var query="SELECT BS_ID,BS_NAME,BS_SLA_LIMIT,BS_SLA_DETAIL FROM "+SCHEMA_G+".BPM_SLA where BS_ID=${bsId}";
 	SynDomeBPMAjax.searchObject(query,{
 		callback:function(data){ 
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			if(data!=null && data.length>0){
 				//alert(data)
 				$("#bsName").val(data[0][1]);
@@ -82,6 +92,16 @@ function doSLAAction(){
 		list_values.push(values);
 	SynDomeBPMAjax.executeQueryWithValues(querys,list_values,{
 			callback:function(data){ 
+				if(data.resultMessage.msgCode=='ok'){
+					data=data.updateRecord;
+				}else{// Error Code
+					//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+					  bootbox.dialog(data.resultMessage.msgDesc,[{
+						    "label" : "Close",
+						     "class" : "btn-danger"
+					 }]);
+					 return false;
+				}
 				if(data!=0){
 					loadDynamicPage("setting/page/setting_sla");
 				}

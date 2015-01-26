@@ -10,7 +10,7 @@ background	:#e5e5e5;
 }
  .bootbox { width: 800px !important;}
  .modal{margin-left:-400px}
- .modal-body{max-height:1000px}
+ .modal-body{max-height:500px}
  .modal.fade.in{top:1%}
  
 </style>
@@ -32,7 +32,17 @@ function showRole(bpmRoleID){
 			  " order  by role_type.BPM_ROLE_TYPE_ORDER  "; 
 	SynDomeBPMAjax.searchObject(query,{
 		callback:function(data){
-			 role_ids=[];
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			} 
+			role_ids=[];
 			if(data!=null && data.length>0){
 				var str="	  <table class=\"table table-striped table-bordered table-condensed\" border=\"1\" style=\"font-size: 12px\"> "+
 			    "	<thead> 	"+
@@ -98,6 +108,16 @@ function doUpdateRoleAction(bpmRoleID){
 	}
 	SynDomeBPMAjax.executeQuery(querys,{
 		callback:function(data){  
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.updateRecord;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			bootbox.hideAll();
 		}
 	});
@@ -118,7 +138,8 @@ function goNext(){
 	}
 } 
 function goToPage(){ 
-	$("#pageNo").val(document.getElementById("pageSelect").value);
+	//$("#pageNo").val(document.getElementById("pageSelect").value);
+	checkWithSet("pageNo",$("#pageSelect").val());
 //	doAction('search','0');
 	searchRole($("#pageNo").val());
 }
@@ -132,7 +153,7 @@ function renderPageSelect(){
 	}
 	pageStr=pageStr+"</select>"; 
 	$("#pageElement").html(pageStr);
-	document.getElementById("pageSelect").value=$("#pageNo").val();
+	checkWithSet("pageSelect",$("#pageNo").val());
 }
 function confirmDelete(id){
 	$( "#dialog-confirmDelete" ).dialog({
@@ -156,6 +177,16 @@ function doAction(id){
 	querys.push(query); 
 	SynDomeBPMAjax.executeQuery(querys,{
 		callback:function(data){ 
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.updateRecord;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			if(data!=0){
 				searchRole("1"); 
 			}
@@ -171,7 +202,16 @@ function searchRole(_page){
 	var queryCount=" select count(*) from (  "+query+" ) as x";
 	SynDomeBPMAjax.searchObject(queryObject,{
 		callback:function(data){
-			  
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			var str="	  <table class=\"table table-striped table-bordered table-condensed\" border=\"1\" style=\"font-size: 12px\"> "+
 			        "	<thead> 	"+
 			        "  		<tr> "+
@@ -210,11 +250,21 @@ function searchRole(_page){
 			        str=str+  " </tbody>"+
 					   "</table> "; 
 					
-			$("#search_section").html(str);
+			$("#search_section_role").html(str);
 		}
 	}); 
 	SynDomeBPMAjax.searchObject(queryCount,{
 		callback:function(data){
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			//alert(data)
 			//alert(calculatePage(_perpageG,data))
 			var pageCount=calculatePage(_perpageG,data);
@@ -258,7 +308,7 @@ function searchRole(_page){
 	    					</td>
 	    					</tr>
 	    					</tbody></table>  
-	    					<div id="search_section"> 
+	    					<div id="search_section_role"> 
     						</div> 
       </div>
       </fieldset> 

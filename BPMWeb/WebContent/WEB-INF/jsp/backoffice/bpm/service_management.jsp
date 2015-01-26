@@ -73,6 +73,16 @@ function assignUser(type){
 			  var queryiner=query+" '%"+request.term+"%' ";
 				SynDomeBPMAjax.searchObject(queryiner,{
 					callback:function(data){ 
+						if(data.resultMessage.msgCode=='ok'){
+							data=data.resultListObj;
+						}else{// Error Code
+							//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+							  bootbox.dialog(data.resultMessage.msgDesc,[{
+								    "label" : "Close",
+								     "class" : "btn-danger"
+							 }]);
+							 return false;
+						}
 						if(data!=null && data.length>0){
 							response( $.map( data, function( item ) {
 					          return {
@@ -112,6 +122,16 @@ function assignHOD(){
 		querys.push(query); 
 		SynDomeBPMAjax.executeQuery(querys,{
 			callback:function(data){ 
+				if(data.resultMessage.msgCode=='ok'){
+					data=data.updateRecord;
+				}else{// Error Code
+					//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+					  bootbox.dialog(data.resultMessage.msgDesc,[{
+						    "label" : "Close",
+						     "class" : "btn-danger"
+					 }]);
+					 return false;
+				}
 				if(data!=0){
 					loadDynamicPage('dispatcher/page/service_management?brId=${brId}&mode=edit');
 				}
@@ -130,6 +150,16 @@ function assignUserToDept(){
 		querys.push(query); 
 		SynDomeBPMAjax.executeQuery(querys,{
 			callback:function(data){ 
+				if(data.resultMessage.msgCode=='ok'){
+					data=data.updateRecord;
+				}else{// Error Code
+					//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+					  bootbox.dialog(data.resultMessage.msgDesc,[{
+						    "label" : "Close",
+						     "class" : "btn-danger"
+					 }]);
+					 return false;
+				}
 				if(data!=0){
 					searchItemList("1");
 				}
@@ -214,6 +244,16 @@ function getService(){
 		" FROM "+SCHEMA_G+".BPM_REPAIRING  where BR_ID=${brId}";
 	   SynDomeBPMAjax.searchObject(query,{
 			callback:function(data){ 
+				if(data.resultMessage.msgCode=='ok'){
+					data=data.resultListObj;
+				}else{// Error Code
+					//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+					  bootbox.dialog(data.resultMessage.msgDesc,[{
+						    "label" : "Close",
+						     "class" : "btn-danger"
+					 }]);
+					 return false;
+				}
 				if(data!=null && data.length>0){
 					$("#brNo").val(data[0][62])
 					$("#bdeptName").val(data[0][1]);
@@ -235,19 +275,49 @@ function getService(){
 	 	  }); 
   }else{ 
 		  SynDomeBPMAjax.getRunningNo("SERVICE","ymd","5",{
-			callback:function(data){ 
+			  if(data.resultMessage.msgCode=='ok'){
+					data=data.resultMessage.msgDesc;
+				}else{// Error Code
+					//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+					  bootbox.dialog(data.resultMessage.msgDesc,[{
+						    "label" : "Close",
+						     "class" : "btn-danger"
+					 }]);
+					 return false;
+				}
+			  callback:function(data){ 
 				if(data!=null && data.length>0){
 					$("#brNo").val(data);
 					var querys=[];  
 					var query="insert into "+SCHEMA_G+".BPM_REPAIRING set BR_NO='"+data+"'";
 					querys.push(query); 
 					SynDomeBPMAjax.executeQuery(querys,{
-						callback:function(data){ 
+						callback:function(data){
+							if(data.resultMessage.msgCode=='ok'){
+								data=data.updateRecord;
+							}else{// Error Code
+								//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+								  bootbox.dialog(data.resultMessage.msgDesc,[{
+									    "label" : "Close",
+									     "class" : "btn-danger"
+								 }]);
+								 return false;
+							}
 							if(data!=0){
 								query=" SELECT "+
 								   " BR_ID , BR_NO FROM "+SCHEMA_G+".BPM_REPAIRING where BR_NO='"+$("#brNo").val()+"'";
 								  SynDomeBPMAjax.searchObject(query,{
 										callback:function(data2){ 
+											if(data2.resultMessage.msgCode=='ok'){
+												data2=data2.resultListObj;
+											}else{// Error Code
+												//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+												  bootbox.dialog(data2.resultMessage.msgDesc,[{
+													    "label" : "Close",
+													     "class" : "btn-danger"
+												 }]);
+												 return false;
+											}
 											loadDynamicPage('dispatcher/page/service_management?brId='+data2[0][0]+'&mode=edit');
 										}
 								  }); 
@@ -290,7 +360,8 @@ function goNext(){
 	}
 } 
 function goToPage(){ 
-	$("#pageNo").val(document.getElementById("pageSelect").value);
+	//$("#pageNo").val(document.getElementById("pageSelect").value);
+	checkWithSet("pageNo",$("#pageSelect").val());
 //	doAction('search','0');
 	//searchItemList($("#pageNo").val());
 }
@@ -304,7 +375,7 @@ function renderPageSelect(){
 	}
 	pageStr=pageStr+"</select>"; 
 	$("#pageElement").html(pageStr);
-	document.getElementById("pageSelect").value=$("#pageNo").val();
+	checkWithSet("pageSelect",$("#pageNo").val());
 }
 function confirmDelete(id){
 	$( "#dialog-confirmDelete" ).dialog({
@@ -328,6 +399,16 @@ function doAction(id){
 	querys.push(query); 
 	SynDomeBPMAjax.executeQuery(querys,{
 		callback:function(data){ 
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.updateRecord;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			if(data!=0){
 				//searchItemList("1"); 
 			}
@@ -349,7 +430,16 @@ function searchItemList(_page){
 	var queryCount=" select count(*) from (  "+query+" ) as x";
 	SynDomeBPMAjax.searchObject(queryObject,{
 		callback:function(data){
-			  
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			var str="	  <table class=\"table table-striped table-bordered table-condensed\" border=\"1\" style=\"font-size: 12px\"> "+
 			        "	<thead> 	"+
 			        "  		<tr> "+
@@ -390,8 +480,19 @@ function searchItemList(_page){
 			$("#item_section").html(str);
 		}
 	}); 
+	/*
 	SynDomeBPMAjax.searchObject(queryCount,{
 		callback:function(data){ 
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			 if(data==0) 
 				 data=1;
 			//alert(calculatePage(_perpageG,data))
@@ -400,6 +501,7 @@ function searchItemList(_page){
 			renderPageSelect();
 		}
 	});
+	*/
 } 
 function showTeam(){
 	var query="SELECT  "+
@@ -412,7 +514,16 @@ function showTeam(){
 		" where user_hod.username='${username}' "; 
 	SynDomeBPMAjax.searchObject(query,{
 		callback:function(data){
-			 
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			if(data!=null && data.length>0){
 				var str="	  <table class=\"table table-striped table-bordered table-condensed\" border=\"1\" style=\"font-size: 12px\"> "+
 			    "	<thead> 	"+
@@ -470,12 +581,32 @@ function doUpdateJob(btdl_type,btdl_state,owner,owner_type,message){
 	querys.push(query); 
 	SynDomeBPMAjax.executeQuery(querys,{
 			callback:function(data){ 
+				if(data.resultMessage.msgCode=='ok'){
+					data=data.updateRecord;
+				}else{// Error Code
+					//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+					  bootbox.dialog(data.resultMessage.msgDesc,[{
+						    "label" : "Close",
+						     "class" : "btn-danger"
+					 }]);
+					 return false;
+				}
 				if(data!=0){
 					 querys=[];  
 					 query="update "+SCHEMA_G+".BPM_REPAIRING set BR_STATE='"+btdl_state+"' where BR_ID=${brId}";
 					querys.push(query); 
 					SynDomeBPMAjax.executeQuery(querys,{
 						callback:function(data){ 
+							if(data.resultMessage.msgCode=='ok'){
+								data=data.updateRecord;
+							}else{// Error Code
+								//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+								  bootbox.dialog(data.resultMessage.msgDesc,[{
+									    "label" : "Close",
+									     "class" : "btn-danger"
+								 }]);
+								 return false;
+							}
 							if(data!=0){
 								showDialog(message);
 							}
@@ -504,6 +635,16 @@ function doUpdateState(btdl_type,btdl_state,owner,owner_type,message_duplicate,m
 	"BTDL_TYPE='"+btdl_type+"' and BTDL_STATE='"+btdl_state+"' and BTDL_OWNER='"+owner+"' and BTDL_OWNER_TYPE='"+owner_type+"'  ";
 	 SynDomeBPMAjax.searchObject(query,{
 			callback:function(data){ 
+				if(data.resultMessage.msgCode=='ok'){
+					data=data.resultListObj;
+				}else{// Error Code
+					//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+					  bootbox.dialog(data.resultMessage.msgDesc,[{
+						    "label" : "Close",
+						     "class" : "btn-danger"
+					 }]);
+					 return false;
+				}
 				if(data!=null && data.length>0){
 					showDialog(message_duplicate);
 				}else{
@@ -520,6 +661,16 @@ function doUpdateState(btdl_type,btdl_state,owner,owner_type,message_duplicate,m
 					 querys.push(query); 
 					SynDomeBPMAjax.executeQuery(querys,{
 						callback:function(data){ 
+							if(data.resultMessage.msgCode=='ok'){
+								data=data.updateRecord;
+							}else{// Error Code
+								//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+								  bootbox.dialog(data.resultMessage.msgDesc,[{
+									    "label" : "Close",
+									     "class" : "btn-danger"
+								 }]);
+								 return false;
+							}
 							if(data!=0){
 								showDialog(message_created);
 							}
@@ -888,7 +1039,7 @@ function doSaveDraftAction(){
     					  		 	<tr style="height: 30px;">
     					   		<td width="100%" colspan="2" align="left">
     					   				<span style="text-decoration: underline;">
-    					   					เงือนใขการชำระ
+    					   					เงื่อนไขการชำระ
     					   				</span>
     					   		</td>
     					   		 
@@ -1035,7 +1186,7 @@ function doSaveDraftAction(){
     					  		 	<tr style="height: 30px;">
     					   		<td width="100%" colspan="3" align="left">
     					   				<span style="text-decoration: underline;">
-    					   				   อุปกรเสริม	
+    					   				   อุปกรณ์เสริม
     					   				</span>&nbsp;&nbsp;<input type="radio"> สายไฟ
     					   		</td>
     					   		 

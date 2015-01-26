@@ -30,8 +30,9 @@ function goNext(){
 	}
 } 
 function goToPage(){ 
-	$("#pageNo").val(document.getElementById("employeeWorkMappingPageSelect").value);
-//	doAction('search','0');
+	//$("#pageNo").val(document.getElementById("employeeWorkMappingPageSelect").value);
+	checkWithSet("pageNo",$("#employeeWorkMappingPageSelect").val());
+	//	doAction('search','0');
 	searchSLA($("#pageNo").val())
 }
 function renderPageSelect(){
@@ -44,7 +45,8 @@ function renderPageSelect(){
 	}
 	pageStr=pageStr+"</select>"; 
 	$("#pageElement").html(pageStr);
-	document.getElementById("employeeWorkMappingPageSelect").value=$("#pageNo").val();
+	$("#employeeWorkMappingPageSelect").val($("#pageNo").val());
+	//document.getElementById("employeeWorkMappingPageSelect").value=$("#pageNo").val();
 }
 function confirmDelete(id){
 	$( "#dialog-confirmDelete" ).dialog({
@@ -75,6 +77,16 @@ function doAction(id){
 	
 	SynDomeBPMAjax.executeQuery(querys,{
 		callback:function(data){ 
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.updateRecord;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			if(data!=0){
 				searchSLA("1");
 				//loadDynamicPage("setting/page/setting_sla");
@@ -87,6 +99,16 @@ function test(){
 	SynDomeBPMAjax.searchObject(query,{ 
 		callback:function(data){
 			//alert(data); 
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			if(data!=null && data.length>0){
 				
 			}
@@ -107,6 +129,16 @@ function searchSLA(_page){
 	var queryCount=" select count(*) from (  "+query+" ) as x";
 	SynDomeBPMAjax.searchObject(queryObject,{
 		callback:function(data){
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			//alert(data);
 			//return false;
 			//var str="<div align=\"left\" style=\"padding-bottom: 4px;width:1070px\"> <a class=\"btn\" onclick=\"showForm('add','0')\"><i class=\"icon-plus-sign\"></i>&nbsp;<span style=\"font-weight: normal;\">Add</span></a></div>"+
@@ -147,11 +179,21 @@ function searchSLA(_page){
 			   }
 			        str=str+  " </tbody>"+
 					   "</table> "; 
-			$("#search_section").html(str);
+			$("#search_section_sla").html(str);
 		}
 	}); 
 	SynDomeBPMAjax.searchObject(queryCount,{
 		callback:function(data){
+			if(data.resultMessage.msgCode=='ok'){
+				data=data.resultListObj;
+			}else{// Error Code
+				//alert(dwr.util.toDescriptiveString(data.resultMessage.exception, 2));
+				  bootbox.dialog(data.resultMessage.msgDesc,[{
+					    "label" : "Close",
+					     "class" : "btn-danger"
+				 }]);
+				 return false;
+			}
 			//alert(data)
 			//alert(calculatePage(_perpageG,data))
 			var pageCount=calculatePage(_perpageG,data);
@@ -195,7 +237,7 @@ function searchSLA(_page){
 	    					</td>
 	    					</tr>
 	    					</tbody></table>  
-	    					<div  id="search_section"> 
+	    					<div  id="search_section_sla"> 
     						</div>
     						<%-- 
 		<table class="table table-striped table-bordered table-condensed" border="1" style="font-size: 12px">
