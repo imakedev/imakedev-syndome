@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+	 <bean id="synDomeBPMService" class="th.co.imake.syndome.bpm.backoffice.service.impl.SynDomeBPMServiceImpl">
+	</bean>
+	<!--  <bean id="myAuthErrorHandler" class="th.co.imake.syndome.bpm.backoffice.handler.AuthentificationListener"/>  -->
+	<bean id="customLogoutSuccessHandler" class="th.co.imake.syndome.bpm.backoffice.handler.CustomLogoutSuccessHandler"/>
+	<!--  
+	<bean id="logoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
+    	<constructor-arg ref="logoutSuccessHandler"/>
+    	<constructor-arg ref="logoutHandlers"/> 
+    </bean> 
+	<bean id="logoutSuccessHandler" class="your.custom.LogoutSuccessHandler"/>
+
+	<bean id="logoutHandlers" class="java.util.Arrays" factory-method="asList">
+    	<constructor-arg>
+        	<array>
+            	<bean class="your.custom.LogoutHandler"/> 
+        </array>
+    </constructor-arg>
+</bean>
+ -->
+</beans>
