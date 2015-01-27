@@ -11,7 +11,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import th.co.imake.syndome.bpm.backoffice.service.SynDomeBPMService;
 import th.co.imake.syndome.bpm.xstream.common.VResultMessage;
-dd
+
 public class SynDomeBPMAjax {
 	private final SynDomeBPMService synDomeBPMService; 
 	public SynDomeBPMAjax(){
