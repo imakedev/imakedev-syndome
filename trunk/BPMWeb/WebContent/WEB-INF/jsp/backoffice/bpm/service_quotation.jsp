@@ -640,7 +640,7 @@ var query="	select * from ("+query_common +" and item.IMA_ItemID not in('900002'
 			 $("#AMOUNT").focus(); 
 			 return false;	  
 		 } 
-		 /*
+		 
 		 if(IS_REPLACE=='1' && !REPLACE_NAME.length>0){
 			 alert('กรุณากรอก ชื่อที่ต้องการเปลี่ยน.');  
 			 $("#REPLACE_NAME").focus(); 
@@ -655,8 +655,10 @@ var query="	select * from ("+query_common +" and item.IMA_ItemID not in('900002'
 		if($('input[name="isNoSerail"][value="1"]').prop('checked')){
 			IS_SERIAL='1';
 			if(SERIAL.length!=13){
-				alert(" กรอก Serial เริ่มต้น 13 หลัก"); 
-				return false;
+				if(SERIAL.length!=15){
+					alert(" กรอก Serial เริ่มต้น 13, 15 หลัก เท่านั้น"); 
+					return false;
+				}
 			}else{
 				PRE_SERIAL=SERIAL.substring(0,9);
 				//alert(PRE_SERIAL);
