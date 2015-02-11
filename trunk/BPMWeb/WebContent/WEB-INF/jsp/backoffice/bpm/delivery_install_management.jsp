@@ -638,13 +638,17 @@ function addItemToList(){
 	var PRE_SERIAL="";
 	//alert(IMA_ItemID);
 	//alert(SERIAL.length);
-	
+	//var SERIAL_INVALID ="0";
 	if($('input[name="isNoSerail"][value="1"]').prop('checked')){
 		IS_SERIAL='1';
+		
 		if(SERIAL.length!=13){
-			alert(" กรอก Serial เริ่มต้น 13 หลัก"); 
-			return false;
-		}else{
+			if(SERIAL.length!=15){
+				alert(" กรอก Serial เริ่มต้น 13, 15 หลัก เท่านั้น"); 
+				return false;
+			}					
+		}
+		else{
 			PRE_SERIAL=SERIAL.substring(0,9);
 			//alert(PRE_SERIAL);
 			SERIAL=SERIAL.substring(9);
