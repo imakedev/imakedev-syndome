@@ -226,6 +226,7 @@ function addItem(){
 		}); 
 } 
 function addItemToList(){
+	//alert('aui aui 1');
 	//alert( $("#bdeptUserId").val());
 	var IMA_ItemID=jQuery.trim($("#IMA_ItemID").val());
 	var LastCostAmt=jQuery.trim($("#LastCostAmt").val());
@@ -258,23 +259,59 @@ function addItemToList(){
 	var querys=[];
 	var query="INSERT INTO "+SCHEMA_G+".BPM_SALE_PRODUCT_ITEM (BSO_ID,CUSCOD,IMA_ItemID,AMOUNT,PRICE,PRICE_COST) "+
 	          " VALUES(${bsoId},'"+$("#CUSCOD").val()+"','"+IMA_ItemID+"',"+AMOUNT+","+LastCostAmt+","+Price+"); ";
-	//alert(query)
+	
+	var fullSerial = jQuery.trim($("#SERIAL").val());
 	querys.push(query);
-	for(var i=0;i<AMOUNT;i++){
-		//alert(SERIAL+i);
-		var val=parseInt(SERIAL, 10)+i;
-		var val_str=(""+val);
-		if(val>99 && val<=999) // 100-999
-			val_str="0"+val;
-		else if(val>9 && val<=99) // 10-99
-			val_str="00"+val;
-		else if(val<=9) // 1-9
-			val_str="000"+val;
-		 query="INSERT INTO "+SCHEMA_G+".BPM_SALE_PRODUCT_ITEM_MAPPING (BSO_ID,CUSCOD,IMA_ItemID,SERIAL,IS_SERIAL) "+
-         " VALUES(${bsoId},'"+$("#CUSCOD").val()+"','"+IMA_ItemID+"','"+PRE_SERIAL+val_str+"','"+IS_SERIAL+"'); "; 
-         //alert("query->"+query)
-		querys.push(query);  
-	} 
+	if(!isNaN(jQuery.trim($("#SERIAL").val()))){
+		for(var i=0;i<AMOUNT;i++){
+			//alert(SERIAL+i);
+			var val=parseInt(SERIAL, 10)+i;
+			var val_str=(""+val);
+			if(val>99 && val<=999) // 100-999
+				val_str="0"+val;
+			else if(val>9 && val<=99) // 10-99
+				val_str="00"+val;
+			else if(val<=9) // 1-9
+				val_str="000"+val;
+	
+			 query="INSERT INTO "+SCHEMA_G+".BPM_SALE_PRODUCT_ITEM_MAPPING (BSO_ID,CUSCOD,IMA_ItemID,SERIAL,IS_SERIAL) "+
+	         " VALUES(${bsoId},'"+$("#CUSCOD").val()+"','"+IMA_ItemID+"','"+PRE_SERIAL+val_str+"','"+IS_SERIAL+"'); "; 
+	         //alert("query->"+query)
+			querys.push(query);  
+		} 
+	}else{//contain String ex. 1501100305M0251(new serial 2015) Aui edit[20150221]
+		var running_no ="";
+		var len = SERIAL.length;
+		var strSerial = "";
+		for(var i = len-1 ;i>0 ;i--){
+			var res = SERIAL.charAt(i);
+			if(!isNaN(res)){//is numeric
+				running_no = res+""+running_no;
+			}else{					
+				strSerial = fullSerial.substr(0, i+1);
+				break;
+			}
+		}
+
+		for(var i=0;i<AMOUNT;i++){ 
+			var val=parseInt(running_no, 10)+i;
+			var val_str=(""+val);
+			if(val>99 && val<=999) // 100-999
+				val_str="0"+val;
+			else if(val>9 && val<=99) // 10-99
+				val_str="00"+val;
+			else if(val<=9) // 1-9
+				val_str="000"+val;
+			
+			query="INSERT INTO "+SCHEMA_G+".BPM_SALE_PRODUCT_ITEM_MAPPING (BSO_ID,CUSCOD,IMA_ItemID,SERIAL,IS_SERIAL) "+
+	         " VALUES(${bsoId},'"+$("#CUSCOD").val()+"','"+IMA_ItemID+"','"+strSerial+""+val_str+"','"+IS_SERIAL+"'); "; 
+	         //alert("query->"+query)
+			querys.push(query);  			
+		} 
+		
+	}
+	
+	
 	SynDomeBPMAjax.executeQuery(querys,{
 		callback:function(data){ 
 			if(data.resultMessage.msgCode=='ok'){
