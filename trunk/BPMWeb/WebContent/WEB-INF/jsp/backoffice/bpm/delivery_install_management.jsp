@@ -464,23 +464,56 @@ function addDiscountToList(){
 				 //alert(query)
 				var querys=[];
 				querys.push(query);
-				for(var i=0;i<AMOUNT;i++){
-					//alert(SERIAL+i);
-					var val=parseInt(SERIAL, 10)+i;
-					var val_str=(""+val);
-					if(val>99 && val<=999) // 100-999
-						val_str="0"+val;
-					else if(val>9 && val<=99) // 10-99
-						val_str="00"+val;
-					else if(val<=9) // 1-9
-						val_str="000"+val;
-					//max_auto=max_auto+i;
-					// alert(max_auto)
-					 query="INSERT INTO "+SCHEMA_G+".BPM_SALE_PRODUCT_ITEM_MAPPING (BSO_ID,CUSCOD,IMA_ItemID,SERIAL,IS_SERIAL,AUTO_K) "+
-			         " VALUES(${bsoId},'"+$("#CUSCOD").val()+"','"+IMA_ItemID+"','"+PRE_SERIAL+val_str+"','"+IS_SERIAL+"',"+max_auto+"); "; 
-			         //alert("query->"+query)
-					querys.push(query);  
-				} 
+				var fullSerial = jQuery.trim($("#SERIAL").val());
+				if(!isNaN(jQuery.trim($("#SERIAL").val()))){
+					for(var i=0;i<AMOUNT;i++){
+						//alert(SERIAL+i);
+						var val=parseInt(SERIAL, 10)+i;
+						var val_str=(""+val);
+						if(val>99 && val<=999) // 100-999
+							val_str="0"+val;
+						else if(val>9 && val<=99) // 10-99
+							val_str="00"+val;
+						else if(val<=9) // 1-9
+							val_str="000"+val;
+						//max_auto=max_auto+i;
+						// alert(max_auto)
+						 query="INSERT INTO "+SCHEMA_G+".BPM_SALE_PRODUCT_ITEM_MAPPING (BSO_ID,CUSCOD,IMA_ItemID,SERIAL,IS_SERIAL,AUTO_K) "+
+				         " VALUES(${bsoId},'"+$("#CUSCOD").val()+"','"+IMA_ItemID+"','"+PRE_SERIAL+val_str+"','"+IS_SERIAL+"',"+max_auto+"); "; 
+				         //alert("query->"+query)
+						querys.push(query);  
+					}
+				}else{//contain String ex. 1501100305M0251(new serial 2015)
+					var running_no ="";
+					var len = SERIAL.length;
+					var strSerial = "";
+					for(var i = len-1 ;i>0 ;i--){
+						var res = SERIAL.charAt(i);
+						if(!isNaN(res)){//is numeric
+							running_no = res+""+running_no;
+						}else{							
+							strSerial = fullSerial.substr(0, i+1);
+							break;
+						}
+					}
+					for(var i=0;i<AMOUNT;i++){ 
+						var val=parseInt(running_no, 10)+i;
+						var val_str=(""+val);
+						if(val>99 && val<=999) // 100-999
+							val_str="0"+val;
+						else if(val>9 && val<=99) // 10-99
+							val_str="00"+val;
+						else if(val<=9) // 1-9
+							val_str="000"+val;
+						
+						query="INSERT INTO "+SCHEMA_G+".BPM_SALE_PRODUCT_ITEM_MAPPING (BSO_ID,CUSCOD,IMA_ItemID,SERIAL,IS_SERIAL,AUTO_K) "+
+				         " VALUES(${bsoId},'"+$("#CUSCOD").val()+"','"+IMA_ItemID+"','"+strSerial+""+val_str+"','"+IS_SERIAL+"',"+max_auto+"); "; 
+						querys.push(query);  
+					} 
+					
+				}
+				
+				
 				//query=" UPDATE  "+SCHEMA_G+".BPM_SALE_ORDER SET BSO_STORE_PRE_SEND ='0' WHERE   BSO_ID=${bsoId} ";
 				//alert(query)
 				//querys.push(query);  
@@ -540,23 +573,56 @@ function doAddItem(IMA_ItemID,LastCostAmt,Price,AMOUNT,SERIAL,WEIGHT,DETAIL,IS_R
 				          " VALUES(${bsoId},'"+$("#CUSCOD").val()+"','"+IMA_ItemID+"',"+AMOUNT+","+LastCostAmt+","+Price+",'"+WEIGHT+"','"+DETAIL+"',"+max_auto+",'"+IS_REPLACE+"','"+REPLACE_NAME+"',"+AMOUNT_RFE_STR+",now()); ";
 				//alert(query)
 				querys.push(query);
-				for(var i=0;i<AMOUNT;i++){
-					//alert(SERIAL+i);
-					var val=parseInt(SERIAL, 10)+i;
-					var val_str=(""+val);
-					if(val>99 && val<=999) // 100-999
-						val_str="0"+val;
-					else if(val>9 && val<=99) // 10-99
-						val_str="00"+val;
-					else if(val<=9) // 1-9
-						val_str="000"+val;
-					//max_auto=max_auto+i;
-				//	alert(max_auto)
-					 query="INSERT INTO "+SCHEMA_G+".BPM_SALE_PRODUCT_ITEM_MAPPING (BSO_ID,CUSCOD,IMA_ItemID,SERIAL,IS_SERIAL,AUTO_K) "+
-			         " VALUES(${bsoId},'"+$("#CUSCOD").val()+"','"+IMA_ItemID+"','"+PRE_SERIAL+val_str+"','"+IS_SERIAL+"',"+max_auto+"); "; 
-			      //    alert("query->"+query)
-					querys.push(query);  
-				} 
+				var fullSerial = jQuery.trim($("#SERIAL").val());
+				if(!isNaN(jQuery.trim($("#SERIAL").val()))){
+					for(var i=0;i<AMOUNT;i++){
+						var val=parseInt(SERIAL, 10)+i;
+						var val_str=(""+val);
+						if(val>99 && val<=999) // 100-999
+							val_str="0"+val;
+						else if(val>9 && val<=99) // 10-99
+							val_str="00"+val;
+						else if(val<=9) // 1-9
+							val_str="000"+val;
+						//max_auto=max_auto+i;
+					//	alert(max_auto)
+						 query="INSERT INTO "+SCHEMA_G+".BPM_SALE_PRODUCT_ITEM_MAPPING (BSO_ID,CUSCOD,IMA_ItemID,SERIAL,IS_SERIAL,AUTO_K) "+
+				         " VALUES(${bsoId},'"+$("#CUSCOD").val()+"','"+IMA_ItemID+"','"+PRE_SERIAL+val_str+"','"+IS_SERIAL+"',"+max_auto+"); "; 
+				      //    alert("query->"+query)
+						querys.push(query);  
+					} 
+				}else{//contain String ex. 1501100305M0251(new serial 2015)
+					var running_no ="";
+					var len = SERIAL.length;
+					var strSerial = "";
+					for(var i = len-1 ;i>0 ;i--){
+						var res = SERIAL.charAt(i);
+						if(!isNaN(res)){//is numeric
+							running_no = res+""+running_no;
+						}else{
+							
+							strSerial = fullSerial.substr(0, i+1);
+							break;
+						}
+					}
+					for(var i=0;i<AMOUNT;i++){ 
+						var val=parseInt(running_no, 10)+i;
+						var val_str=(""+val);
+						if(val>99 && val<=999) // 100-999
+							val_str="0"+val;
+						else if(val>9 && val<=99) // 10-99
+							val_str="00"+val;
+						else if(val<=9) // 1-9
+							val_str="000"+val;
+						
+						query="INSERT INTO "+SCHEMA_G+".BPM_SALE_PRODUCT_ITEM_MAPPING (BSO_ID,CUSCOD,IMA_ItemID,SERIAL,IS_SERIAL,AUTO_K) "+
+				         " VALUES(${bsoId},'"+$("#CUSCOD").val()+"','"+IMA_ItemID+"','"+strSerial+""+val_str+"','"+IS_SERIAL+"',"+max_auto+"); "; 
+						querys.push(query); 
+					} 
+					
+				}
+				
+				
 				if(IMA_ItemID!='900002' && IMA_ItemID!='900004' && IMA_ItemID!='90100002'){
 					query=" UPDATE  "+SCHEMA_G+".BPM_SALE_ORDER SET BSO_STORE_PRE_SEND ='0' WHERE   BSO_ID=${bsoId} ";
 					//alert(query)
@@ -636,9 +702,6 @@ function addItemToList(){
 	}
 	var IS_SERIAL="0";
 	var PRE_SERIAL="";
-	//alert(IMA_ItemID);
-	//alert(SERIAL.length);
-	//var SERIAL_INVALID ="0";
 	if($('input[name="isNoSerail"][value="1"]').prop('checked')){
 		IS_SERIAL='1';
 		
@@ -649,10 +712,10 @@ function addItemToList(){
 			}					
 		}
 		else{
-			PRE_SERIAL=SERIAL.substring(0,9);
-			//alert(PRE_SERIAL);
-			SERIAL=SERIAL.substring(9);
-			//alert(SERIAL);
+			PRE_SERIAL=SERIAL.substring(0,11);
+			alert(PRE_SERIAL);
+			SERIAL=SERIAL.substring(11);
+			alert(SERIAL);
 		}
 	}else{
 		SERIAL="1";
@@ -678,19 +741,51 @@ function addItemToList(){
 		}
 	}
 	// check duplicate
-  if(IS_SERIAL=='1'){
-	var inStr="(";
-	for(var i=0;i<AMOUNT;i++){ 
-		var val=parseInt(SERIAL, 10)+i;
-		var val_str=(""+val);
-		if(val>99 && val<=999) // 100-999
-			val_str="0"+val;
-		else if(val>9 && val<=99) // 10-99
-			val_str="00"+val;
-		else if(val<=9) // 1-9
-			val_str="000"+val;
-		inStr=inStr+"'"+PRE_SERIAL+val_str+"'"+((AMOUNT-1!=i)?",":""); 
-	} 
+	
+	isNumber=checkNumber(jQuery.trim($("#SERIAL").val())); 
+	var fullSerial = jQuery.trim($("#SERIAL").val());
+  	if(IS_SERIAL=='1'){
+		var inStr="(";
+		if(!isNaN(jQuery.trim($("#SERIAL").val()))){
+		
+			for(var i=0;i<AMOUNT;i++){ 
+				var val=parseInt(SERIAL, 10)+i;
+				var val_str=(""+val);
+				if(val>99 && val<=999) // 100-999
+					val_str="0"+val;
+				else if(val>9 && val<=99) // 10-99
+					val_str="00"+val;
+				else if(val<=9) // 1-9
+					val_str="000"+val;
+				inStr=inStr+"'"+PRE_SERIAL+val_str+"'"+((AMOUNT-1!=i)?",":""); 
+			} 
+		}else{//contain String ex. 1501100305M0251(new serial 2015) Aui edit[20150221]
+			var running_no ="";
+			var len = SERIAL.length;
+			var strSerial = "";
+			for(var i = len-1 ;i>0 ;i--){
+				var res = SERIAL.charAt(i);
+				if(!isNaN(res)){//is numeric
+					running_no = res+""+running_no;
+				}else{					
+					strSerial = fullSerial.substr(0, i+1);
+					break;
+				}
+			}
+
+			for(var i=0;i<AMOUNT;i++){ 
+				var val=parseInt(running_no, 10)+i;
+				var val_str=(""+val);
+				if(val>99 && val<=999) // 100-999
+					val_str="0"+val;
+				else if(val>9 && val<=99) // 10-99
+					val_str="00"+val;
+				else if(val<=9) // 1-9
+					val_str="000"+val;
+				inStr=inStr+"'"+strSerial+""+val_str+"'"+((AMOUNT-1!=i)?",":""); 
+			} 
+			
+		}
 	inStr=inStr+")"; 
 	var checkduplicateQuery="SELECT so.BSO_TYPE_NO,so.bso_id FROM "+SCHEMA_G+".BPM_SALE_PRODUCT_ITEM_MAPPING mapping "+
 	 "  left join  "+SCHEMA_G+".BPM_SALE_ORDER so on mapping.bso_id=so.BSO_ID  WHERE IS_SERIAL ='1' and SERIAL in   "+inStr +" limit 1";
