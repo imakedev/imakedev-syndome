@@ -261,7 +261,7 @@ public class PstObjectResource extends BaseResource {
 				if (xbpsTerm != null) { 
 					if (xbpsTerm.getServiceName() != null
 							&& xbpsTerm.getServiceName().length()!=0) {
-						logger.debug(" BPS servicename = "
+						logger.error(" BPS servicename = "
 								+ xbpsTerm.getServiceName());
 						String serviceName = xbpsTerm.getServiceName();  
 						VResultMessage vresultMessage =null;
@@ -431,7 +431,7 @@ public class PstObjectResource extends BaseResource {
 									"   on item_mapping.BSO_ID=item.BSO_ID "+
 									" where  so_inner.BSO_CREATED_DATE between '"+start+" 00:00:00' and '"+end+" 23:59:59' "+
 									" and so_inner.bso_type_no is not null ) ";
-							
+							//System.out.println("...report so query = "+query);
 							vresultMessage= pstObjectService.searchObject(query);
 							 
 					         List<Object> so_list= vresultMessage.getResultListObj();
@@ -852,6 +852,87 @@ public class PstObjectResource extends BaseResource {
 							return getRepresentation(entity, result_return, xstream);
 						}
 						
+						//----Aui add KA Report---//
+						else if(serviceName.equals(ServiceConstant.PST_OBJECT_SEARCH_REPORT_KA)){
+							System.out.println("------aui print PstObj KA -------");
+							VResultMessage result_return = new VResultMessage();
+							VMessage resultMessage =new VMessage();
+							String msgCode="ok";
+							String msgDesc="ok";
+							resultMessage.setMsgDesc(msgDesc);
+							resultMessage.setMsgCode(msgCode); 
+							result_return.setResultMessage(resultMessage); 
+							String start_date=xbpsTerm.getQuery()[0];
+							String end_date=xbpsTerm.getQuery()[1];
+							String viewBy=xbpsTerm.getQuery()[2];
+							String viewBy_where="";
+							List<Object[]> ka_list_return=null;
+							List<Object[]> viewBy_list=null; 
+							
+							String query_list="SELECT call_center.BCC_NO as BCC_NO, "+//1
+						 			"IFNULL(call_center.BCC_ADDR1 ,'') as BRANCH, "+//2
+						 			"IFNULL(call_center.BCC_PROVINCE ,'') as PROVINCE, "+//3
+						 			"CONCAT(IFNULL(call_center.BCC_ADDR1 ,''),' ', "+
+						 			"IFNULL(call_center.BCC_ADDR2 ,''),' ',IFNULL(call_center.BCC_ADDR3 ,'') , ' ' ,IFNULL(call_center.BCC_PROVINCE ,''),' ',IFNULL(call_center.BCC_ZIPCODE ,'')) as ADDRESS , "+//4
+						 			"IFNULL(call_center.BCC_SERIAL,'') as BCC_SERIAL, "+//5
+						 			"IFNULL(call_center.BCC_MODEL,'') as BCC_MODEL, "+//6
+						 			"IFNULL(call_center.BCC_CAUSE,'') as BCC_CAUSE, "+//7
+						 			"IFNULL(sp.SPARES,'') as SPARES, "+//8
+						 			"IFNULL(job_status.BJS_STATUS,'')  as JOB_STATUS ,	"+//9
+						 			"IFNULL(service_job.SBJ_PROBLEM_CAUSE,'') as PROBLEM_CAUSE, "+//10
+						 			"IFNULL(service_job.SBJ_JOB_PROBLEM_SOLUTION,'') as PROBLEM_SOLUTION, "+//11
+						 			"CONCAT(IFNULL(user.firstname,''),' ',IFNULL(user.lastname,'')) AS OWNER, "+//12
+						 			"IFNULL(dept.BDEPT_DETAIL,'') as DEPT_NAME, "+//13
+						 			"IFNULL(DATE_FORMAT(call_center.BCC_CREATED_TIME,'%d/%m/%Y'),'') as CREATE_DATE, "+//14
+						 			"IFNULL(DATE_FORMAT(call_center.BCC_DUE_DATE,'%d/%m/%Y'),'Pending') as SLA_Date, "+//15
+						 			"CASE "+
+						 				"WHEN call_center.BCC_DUE_DATE IS NOT NULL "+
+						 			"THEN 'Complete' "+
+						 			"ELSE '' "+
+						 			"END  as PLAN_CLOSE, "+//16
+						 			"DATEDIFF(IFNULL(call_center.BCC_DUE_DATE,now()),call_center.BCC_CREATED_TIME) as Aging_SLA, "+//17
+						 			"IFNULL(TIMESTAMPDIFF(day, call_center.BCC_CREATED_TIME,now()),'') as Aging_Job "+//18
+			    
+									"FROM SYNDOME_BPM_DB.BPM_TO_DO_LIST todo "+
+									"left join SYNDOME_BPM_DB.BPM_SYSTEM_PARAM param "+ 
+										"on (param.param_name='FLOW_NAME' and param.`key`=todo.btdl_type) "+
+									"left join SYNDOME_BPM_DB.BPM_CALL_CENTER call_center "+
+										"on (todo.BTDL_REF=call_center.BCC_NO) "+
+									"left join SYNDOME_BPM_DB.BPM_SERVICE_JOB service_job "+
+										"on (call_center.BCC_NO=service_job.BCC_NO)   "+
+									"left join SYNDOME_BPM_DB.BPM_JOB_STATUS job_status "+
+										"on (job_status.BJS_ID=service_job.SBJ_JOB_STATUS and job_status.BJS_TYPE=2)   "+
+									"left join SYNDOME_BPM_DB.BPM_SYSTEM_PARAM param2 "+
+										"on (param2.param_name='STATE' and param2.`key`=todo.BTDL_STATE) "+
+									"left join ( "+
+										"SELECT mapping.BCC_NO,GROUP_CONCAT(IFNULL(product.IMA_ItemName,'') separator ',') AS SPARES "+
+										"FROM SYNDOME_BPM_DB.BPM_SERVICE_ITEM_MAPPING  mapping "+
+										"left join SYNDOME_BPM_DB.BPM_PRODUCT product "+
+											"on mapping.IMA_ItemID=product.IMA_ItemID  and mapping.BSIM_TYPE=2 "+
+										"GROUP BY mapping.BCC_NO) sp "+
+										"on sp.BCC_NO =call_center.BCC_NO "+ 
+									"left join SYNDOME_BPM_DB.user user "+
+										"on user.username = todo.BTDL_OWNER "+
+									"left join SYNDOME_BPM_DB.BPM_DEPARTMENT_USER dept_user "+
+										"on dept_user.USER_ID = user.id "+
+									"left join SYNDOME_BPM_DB.BPM_DEPARTMENT dept "+
+										"on dept.BDEPT_ID = dept_user.BDEPT_ID "+
+			    
+									//"where "+
+									"where todo.BTDL_HIDE='1' "+
+										"and todo.BTDL_TYPE='2' "+
+										"and call_center.BCC_LOCATION like N'%"+viewBy+"%' "+
+										//" call_center.BCC_LOCATION like N'%ATM%' ";
+										"and call_center.BCC_CREATED_TIME "+
+										" between '"+start_date+" 00:00:00' and '"+end_date+" 23:59:59'     ";		
+							
+							 vresultMessage= pstObjectService.searchObject(query_list);
+							   
+							 
+							return getRepresentation(entity, vresultMessage, xstream);
+							
+						}
+						
 						else if(serviceName.equals(ServiceConstant.PST_OBJECT_SEARCH_SERVICE)){
 							//int updateRecord=pstObjectService.executeQuery(xbpsTerm.getQuery());
 							String query=SERVICE_QUERY+"'"+xbpsTerm.getQuery()[0]+"'"; 
@@ -860,6 +941,7 @@ public class PstObjectResource extends BaseResource {
 							return getRepresentation(entity, vresultMessage, xstream);
 							//return returnUpdateRecord(entity,xbpsTerm,updateRecord);
 						}else if(serviceName.equals(ServiceConstant.PST_OBJECT_SEARCH_TO_DO_LIST)){
+							//logger.error("...aui in PstObjectResource 1111111111");
 							//int updateRecord=pstObjectService.executeQuery(xbpsTerm.getQuery());
 							//String query=SERVICE_QUERY+"'"+xbpsTerm.getQuery()[0]+"'"; 
 							// PstObject pstObject = new PstObject(new String[]{serviceType,username,role,page,isStore});
@@ -876,14 +958,16 @@ public class PstObjectResource extends BaseResource {
 							String job_key=xbpsTerm.getQuery()[8]; // job no
 							String BTDL_CREATED_TIME=xbpsTerm.getQuery()[9]; // d_m_y-d_m_y
 							String queryall=getTodoListQuery(service_type, service_status,usernameG, rolesG, _page, _perpageG, isStore,job_key,BTDL_CREATED_TIME,type);
-							//System.out.println(queryall);
+							//System.out.println("-----aui print 11111 queryall="+queryall);
 							int limitRow=(_page>1)?((_page-1)*_perpageG):0;
 						    String queryObject="";
 							  if(type.equals("1")){
 								  queryObject="  "+queryall+"   limit "+limitRow+", "+_perpageG;
+								  //System.out.println("queryObject-->1 ="+queryObject);
 							  }else{
 								  //queryObject=" select count(*) from (  "+queryall+" ) as x";
 								  queryObject=queryall;
+								  //System.out.println("queryObject-->2 ="+queryObject);
 							  }
 							  //System.out.println(queryObject);
 							vresultMessage=pstObjectService.searchObject(queryObject);
@@ -1511,10 +1595,16 @@ public class PstObjectResource extends BaseResource {
 			    " IFNULL(call_center.BCC_PROVINCE ,'') as c22,"+
 			    " IFNULL(call_center.BCC_ZIPCODE ,'') as c23,"+
 			    " IFNULL(DATE_FORMAT(call_center.BCC_DUE_DATE,'%d/%m/%Y'),'') as c24, "+
-			    " IFNULL((select BTDL_STATE  FROM  "+ServiceConstant.SCHEMA+".BPM_TO_DO_LIST todo  "+
-			  	"  where todo.btdl_ref=call_center.BCC_NO and todo.btdl_type='2' order by btld_ai desc limit 1 ) ,'') as c25, "+
-			  	 " IFNULL((select BTDL_OWNER  FROM  "+ServiceConstant.SCHEMA+".BPM_TO_DO_LIST todo  "+
-				  	"  where todo.btdl_ref=call_center.BCC_NO and todo.btdl_type='2' order by btld_ai desc limit 1 ) ,'') as c26, "+
+			    /*-----------aui comment for error sql-------------*/
+			    //" IFNULL((select BTDL_STATE  FROM  "+ServiceConstant.SCHEMA+".BPM_TO_DO_LIST todo  "+
+			  	//"  where todo.btdl_ref=call_center.BCC_NO and todo.btdl_type='2' order by btld_ai desc limit 1 ) ,'') as c25, "+
+			  	//" IFNULL((select BTDL_OWNER  FROM  "+ServiceConstant.SCHEMA+".BPM_TO_DO_LIST todo  "+
+				//  	"  where todo.btdl_ref=call_center.BCC_NO and todo.btdl_type='2' order by btld_ai desc limit 1 ) ,'') as c26, "+
+			  	/*--------------------------------------------------*/ 
+			  	/*-----------------Begin aui edit for solve sql error--------------*/
+			  	" IFNULL(todo2.BTDL_STATE,'') as c25, "+
+			  	" IFNULL(todo2.BTDL_OWNER,'') as c26, "+
+			  	/*------------------End aui edit for solve sql error--------------*/
 				 " IFNULL(call_center.BCC_STATE ,'') as c27,  "+	
 			 	 " IFNULL(DATE_FORMAT(call_center.BCC_DUE_DATE_START,'%H:%i'),'') as c28, "+
 			 	 " IFNULL(DATE_FORMAT(call_center.BCC_DUE_DATE_END,'%H:%i'),'') as c29, "+ 
@@ -1567,6 +1657,11 @@ public class PstObjectResource extends BaseResource {
 		 " on (job_status.BJS_ID=service_job.SBJ_JOB_STATUS and job_status.BJS_TYPE=2)   "+ 
 		 " left join "+ServiceConstant.SCHEMA+".BPM_SYSTEM_PARAM param2 "+
 			"on (param2.param_name='STATE' and param2.key=todo.BTDL_STATE) "+
+		 /*-----------------Begin aui edit for solve sql error--------------*/
+		 " left join (select BTDL_STATE,BTDL_OWNER,btdl_ref,BTDL_CREATED_TIME  FROM  "+ServiceConstant.SCHEMA+".BPM_TO_DO_LIST todo   "+ 
+		 			" where todo.btdl_type='2' order by btld_ai desc limit 1 ) as todo2 "+
+				    " on todo2.btdl_ref=call_center.BCC_NO "+
+		/*------------------End aui edit for solve sql error--------------*/
 		" where "+ 
 		" ( ( todo.BTDL_OWNER in "+rolesG+" and todo.BTDL_OWNER_TYPE='2' )  "+
 		" OR ( todo.BTDL_OWNER='"+usernameG+"' and todo.BTDL_OWNER_TYPE='1' ) )  and todo.BTDL_HIDE='1'  and todo.BTDL_TYPE='2' "; 
@@ -1599,8 +1694,8 @@ public class PstObjectResource extends BaseResource {
 			   " 		,IFNULL(pmma.BPMJ_PROVINCE ,''),' ',IFNULL(pmma.BPMJ_ZIPCODE ,'')) as c21 , "+
 		    " IFNULL(pmma.BPMJ_PROVINCE ,'') as c22,"+
 		    " IFNULL(pmma.BPMJ_ZIPCODE ,'') as c23,"+
-		   // " IFNULL(DATE_FORMAT(pmma.BISJ_DELIVERY_DUEDATE,'%d/%m/%Y'),'') as c24, "+
 		    " CONCAT(IFNULL(DATE_FORMAT(pmma.BPMJ_DUEDATE,'%d/%m/%Y'),''),' ',IFNULL(DATE_FORMAT(pmma.BPMJ_DUEDATE_START_TIME,'%H:%i'),'') ) as c24, "+
+		    //" '' as c25, '' as c26,"+
 		    " IFNULL((select BTDL_STATE  FROM  "+ServiceConstant.SCHEMA+".BPM_TO_DO_LIST todo  "+
 		  //	"  where todo.btdl_ref=pmma.BPMJ_NO and todo.REF_NO=pmma.BPMJ_ORDER  and todo.btdl_type='3' order by BTDL_CREATED_TIME desc limit 1 ) ,'') as c25, "+
 		  "  where concat(pmma.BPMJ_NO,'_',pmma.BPMJ_SERAIL,'_',pmma.BPMJ_ORDER)=todo.BTDL_REF  and todo.btdl_type='3' order by btld_ai desc limit 1 ) ,'') as c25, "+
@@ -1653,9 +1748,11 @@ public class PstObjectResource extends BaseResource {
 			} 
 		 query_pm_ma=query_pm_ma+""+
 	" FROM "+ServiceConstant.SCHEMA+".BPM_TO_DO_LIST todo left join "+ServiceConstant.SCHEMA+".BPM_SYSTEM_PARAM param "+
-	"on (param.param_name='FLOW_NAME' and param.key=todo.btdl_type) left join "+ServiceConstant.SCHEMA+".BPM_PM_MA_JOB pmma "+
+	"on (param.param_name='FLOW_NAME' and param.key=todo.btdl_type) "+
+	" left join "+ServiceConstant.SCHEMA+".BPM_PM_MA_JOB pmma "+
 	//" on (todo.BTDL_REF=pmma.BPMJ_NO and todo.REF_NO=pmma.BPMJ_ORDER)   "+  
-	" on (concat(pmma.BPMJ_NO,'_',pmma.BPMJ_SERAIL,'_',pmma.BPMJ_ORDER)=todo.BTDL_REF ) "+
+	" on (pmma.BPMJ_NO=todo.BTDL_REF ) "+
+	//" on (concat(pmma.BPMJ_NO,'_',pmma.BPMJ_SERAIL,'_',pmma.BPMJ_ORDER)=todo.BTDL_REF ) "+
 	 " left join "+ServiceConstant.SCHEMA+".BPM_JOB_STATUS job_status "+
 	 " on (job_status.BJS_ID=pmma.BPMJ_JOB_STATUS and job_status.BJS_TYPE=3)   "+ 
 	 " left join "+ServiceConstant.SCHEMA+".BPM_SALE_ORDER so "+
@@ -1752,14 +1849,23 @@ public class PstObjectResource extends BaseResource {
 			" OR ( todo.BTDL_OWNER='"+usernameG+"' and todo.BTDL_OWNER_TYPE='1' ) )  and todo.BTDL_HIDE='1'  and todo.BTDL_TYPE='4' "; 
 				// System.out.println("query_pm_ma->"+query_pm_ma);
 	String queryall="";
-	
+	String queryall1="";
 	if(type.equals("1")){
-		queryall=" select * from ( "+query_so+" union "+query_services+" union "+query_inner_services+"  union "+query_pm_ma+" ) as syndome  "+service_query+BTDL_CREATED_TIME_query+" order by c0";
-		 // queryObject="  "+queryall+"   limit "+limitRow+", "+_perpageG;
+		//System.out.println("---aui print case 11111");
+		//queryall=" select * from ( "+query_so+" union "+query_services+" union "+query_inner_services+"  union "+query_pm_ma+" ) as syndome  "+service_query+BTDL_CREATED_TIME_query+" order by c0";
+		queryall=" select * from ( "+query_so+" union "+query_services+" union "+query_inner_services+" ) as syndome  "+service_query+BTDL_CREATED_TIME_query+" order by c0";
+		
+		// queryObject="  "+queryall+"   limit "+limitRow+", "+_perpageG;
 	  }else{
-		  queryall=" select count(*) from ( "+query_so+" union "+query_services+" union "+query_inner_services+"  union "+query_pm_ma+" ) as syndome  "+service_query+BTDL_CREATED_TIME_query+" ";
-		 //queryObject=" select count(*) from (  "+queryall+" ) as x"; 
+		  //System.out.println("---aui print case 22222");
+		  //queryall=" select count(*) from ( "+query_so+" union "+query_services+" union "+query_inner_services+"  union "+query_pm_ma+" ) as syndome  "+service_query+BTDL_CREATED_TIME_query+" ";
+		  //queryall=" select count(*) from ( "+query_so+" union "+query_services+" union "+query_inner_services+" ) as syndome  "+service_query+BTDL_CREATED_TIME_query+" ";
+		  queryall=" select * from ( "+query_so+" union "+query_services+" union "+query_inner_services+" ) as syndome  "+service_query+BTDL_CREATED_TIME_query+" ";
+		  queryall=" select count(*) from (  "+queryall+" ) as x"; 
 	  }
+	//System.out.println("---aui print-----2323232323");
+	//System.out.println("----aui print todolist queryall1 = "+queryall1);
+	//System.out.println("----aui print todolist queryall = "+queryall);
 		return queryall;
 	}
 	private Representation returnUpdateRecord(Representation entity,th.co.imake.syndome.bpm.xstream.PstObject xbpsTerm,int updateRecord){
