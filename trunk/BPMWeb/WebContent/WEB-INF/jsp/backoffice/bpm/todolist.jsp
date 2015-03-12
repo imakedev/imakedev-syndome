@@ -89,6 +89,15 @@ function goNext(){
 		getTodolist(next)
 	}
 } 
+/*function goFirst(){
+	$("#pageNo").val('1');
+	getTodolist('1');
+} 
+function goLast(){
+	var last=parseInt($("#pageCount").val());
+	$("#pageNo").val(last);
+	getTodolist(last)
+} */
 function goToPage(){ 
 	//$("#pageNo").val(document.getElementById("employeeWorkMappingPageSelect").value);
 	//$("#pageNo").val($("#employeeWorkMappingPageSelect").val());
@@ -103,8 +112,8 @@ function renderPageSelect(){
 	var pageCount=$("#pageCount").val(); 
 	for(var i=1;i<=pageCount;i++){
 		pageStr=pageStr+"<option value=\""+i+"\">"+i+"</option>";
-		if(i==30)
-			break;
+		//if(i==30)
+		//	break;
 	}
 	pageStr=pageStr+"</select>"; 
 	$("#pageElement").html(pageStr);
@@ -371,7 +380,7 @@ SynDomeBPMAjax.searchTodoList(service_type,service_status,usernameG,rolesG,_page
 });
 
 //alert(service_type+","+usernameG+","+rolesG+","+_page+","+_perpageG+","+isStore)
-/*
+
 SynDomeBPMAjax.searchTodoList(service_type,service_status,usernameG,rolesG,_page+"",_perpageG+"",isStore,"2",key_job,BTDL_CREATED_TIME,{
 //SynDomeBPMAjax.searchObject(queryCount,{
 	callback:function(data){
@@ -385,14 +394,17 @@ SynDomeBPMAjax.searchTodoList(service_type,service_status,usernameG,rolesG,_page
 			 }]);
 			 return false;
 		}
-		//alert(calculatePage(_perpageG,data))
 		var pageCount=calculatePage(_perpageG,data);
 		checkWithSet("pageCount",pageCount);
-		//$("#pageCount").val(pageCount);
+		//label.text(charsleft);
+	    //$('#LblAboutMeCount').html(charsleft);
+		$("#totalCount").text('Total '+data+' Records');
+		$("#totalCount").html('Total '+data+' Records');
+		$("#pageCount").val(pageCount);
 		renderPageSelect();
 	}
 });
-*/
+
 } 
   
 function renderServiceType(type){
@@ -1608,11 +1620,12 @@ function doAssignTeamIT(bdept_id,bccNo,_state,type_no){
 	    					  <span style="padding-left: 20px;font-size: 23;color: red"><strong>วันนี้เที่ยง 12:05 ขอ Down ระบบ ประมาณ 5 นาทีครับ เริ่มใช้งานได้ 12:15</strong></span>
 	    					   --%>
 	    					</td><td align="right" width="30%"> 
-	    					Total 1,000 Records | <a onclick="goPrev()">Prev</a>&nbsp;|&nbsp;
+	    					<label id ="totalCount"></label>
+	    					<!-- Total 1,000 Records | <a onclick="goFirst()">&laquo;First</a>&nbsp;|-->&nbsp;<a onclick="goPrev()">Prev</a>&nbsp;|&nbsp;</span>
 	    					<span id="pageElement">
 	    					<select name="employeeWorkMappingPageSelect" id="employeeWorkMappingPageSelect" onchange="goToPage()" style="width: 50px"><option value="1">1</option></select>
 	    					</span>
-	    					&nbsp;|&nbsp;<a onclick="goNext()">Next</a>&nbsp;
+	    					&nbsp;|&nbsp;<a onclick="goNext()">Next</a>&nbsp;<!-- |&nbsp;<a onclick="goLast()">Last&raquo;</a>&nbsp; -->
 	    					<!-- <a class="btn btn-primary" onclick="doSearch('search','0')"><i class="icon-search icon-white"></i>&nbsp;Search</a> -->
 	    					</td>
 	    					</tr>
