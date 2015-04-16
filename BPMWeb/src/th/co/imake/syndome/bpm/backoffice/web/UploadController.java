@@ -899,7 +899,7 @@ public class UploadController {
 	    " IFNULL(call_center.BCC_CONTACT ,'') as c15,"+
 	    " IFNULL(call_center.BCC_TEL ,'') as c16,"+
 	    " IFNULL(call_center.BCC_CUSTOMER_NAME ,'') as c17,"+  
-	    " IFNULL(call_center.BCC_ADDR1 ,'') as c18,"+
+	    " concat(IFNULL(call_center.BCC_BRANCH ,''),' ',IFNULL(call_center.BCC_ADDR1 ,'')) as c18,"+
 	    " IFNULL(call_center.BCC_ADDR2 ,'') as c19,"+
 	    " IFNULL(call_center.BCC_ADDR3 ,'') as c20,"+
 	    " IFNULL(call_center.BCC_LOCATION ,'') as c21,"+
@@ -1184,7 +1184,7 @@ public class UploadController {
  " IFNULL(call_center.BCC_CONTACT,'') AS c4,   "+
 
 " IFNULL(BCC_TEL,'')as c5 ,  "+ 
-" concat(IFNULL(BCC_ADDR1,''),' ',IFNULL(BCC_ADDR2,''),' ',IFNULL(BCC_ADDR3,'')  "+
+" concat(IFNULL(BCC_BRANCH,''),' ',IFNULL(BCC_ADDR1,''),' ',IFNULL(BCC_ADDR2,''),' ',IFNULL(BCC_ADDR3,'')  "+
 " ,' ',IFNULL(BCC_PROVINCE,''),' ',IFNULL(BCC_ZIPCODE,'')) as c6,  "+
 /*" concat( REPLACE(BCC_LOCATION,'-',''),' ',REPLACE(BCC_ADDR1,'-',''),' ',REPLACE(BCC_ADDR2,'-',''),' ',REPLACE(BCC_ADDR3,'-','')  "+
 " ,' ',REPLACE(BCC_PROVINCE,'-',''),' ',REPLACE(BCC_ZIPCODE,'-','')) as c6,  "+
@@ -1454,7 +1454,7 @@ public class UploadController {
 				  "  DATE_FORMAT(now(),'%d/%m/%Y')  as c1,"+
 				  " IFNULL(call_center.BCC_LOCATION ,'') as c2,"+ //
 				  " IFNULL(call_center.BCC_CONTACT ,'') as c3,"+
-				  " concat(IFNULL(call_center.BCC_ADDR1 ,''),' ',IFNULL(call_center.BCC_ADDR2 ,''),' ',IFNULL(call_center.BCC_ADDR3 ,''),' '"
+				  " concat(IFNULL(call_center.BCC_BRANCH ,''),' ',IFNULL(call_center.BCC_ADDR1 ,''),' ',IFNULL(call_center.BCC_ADDR2 ,''),' ',IFNULL(call_center.BCC_ADDR3 ,''),' '"
 				  + " ,IFNULL(call_center.BCC_PROVINCE ,''),' ',IFNULL(call_center.BCC_ZIPCODE ,'') ) as c4,"+
 				  " IFNULL(call_center.BCC_TEL ,'') as c5,"+ 
 				  " '' as c6,"+ 
