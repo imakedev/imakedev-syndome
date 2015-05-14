@@ -210,7 +210,8 @@ public class PstObjectResource extends BaseResource {
 	    " IFNULL(service_job.SBJ_BORROW_SERAIL ,'') as c160 ,"+
 	    " IFNULL(call_center.BCC_MA_TYPE ,'') as c161 , "+
 	    " IFNULL(service_job.SBJ_JOB_PROBLEM_ID ,'') as c162 , "+
-	    " IFNULL(service_job.SBJ_JOB_PROBLEM_SOLUTION ,'') as c163 "+ 
+	    " IFNULL(service_job.SBJ_JOB_PROBLEM_SOLUTION ,'') as c163, "+ 
+	    " IFNULL(call_center.BCC_BRANCH ,'') as c164 "+
 	   " "+
 	   " FROM "+ServiceConstant.SCHEMA+".BPM_CALL_CENTER call_center left join  "+
 	   "  "+ServiceConstant.SCHEMA+".BPM_ARMAS arms   "+
@@ -562,31 +563,91 @@ public class PstObjectResource extends BaseResource {
 									" "+ServiceConstant.SCHEMA+".BPM_CALL_CENTER call_center_inner on sv_inner.bcc_no=call_center_inner.bcc_no   "+
 									" where    "+
 									" sv_inner.BSJ_CREATED_TIME between '"+start+" 00:00:00' and '"+end+" 23:59:59' "+
-									" and sv_inner.SBJ_DEPT_ID=2) "+ // -- as st_1
+									" and sv_inner.SBJ_DEPT_ID=2 and call_center_inner.BCC_IS_MA='1' ) "+ // -- as st_1
 									" union all  "+
 									" ( SELECT COUNT(*) FROM "+ServiceConstant.SCHEMA+".BPM_SERVICE_JOB sv_inner left join  "+
 									" "+ServiceConstant.SCHEMA+".BPM_CALL_CENTER call_center_inner on sv_inner.bcc_no=call_center_inner.bcc_no   "+
 									" where    "+
 									" sv_inner.BSJ_CREATED_TIME between '"+start+" 00:00:00' and '"+end+" 23:59:59' "+
-									" and sv_inner.SBJ_DEPT_ID=3)    "+//--  as st_2 
+									" and sv_inner.SBJ_DEPT_ID=2 and call_center_inner.BCC_IS_MA='2' ) "+ // -- as st_1_2
 									" union all  "+
 									" ( SELECT COUNT(*) FROM "+ServiceConstant.SCHEMA+".BPM_SERVICE_JOB sv_inner left join  "+
 									" "+ServiceConstant.SCHEMA+".BPM_CALL_CENTER call_center_inner on sv_inner.bcc_no=call_center_inner.bcc_no   "+
 									" where    "+
 									" sv_inner.BSJ_CREATED_TIME between '"+start+" 00:00:00' and '"+end+" 23:59:59' "+
-									" and sv_inner.SBJ_DEPT_ID=4)    "+//-- as st_3
+									" and sv_inner.SBJ_DEPT_ID=2 and call_center_inner.BCC_IS_MA='0' ) "+ // -- as st_1_3
 									" union all  "+
 									" ( SELECT COUNT(*) FROM "+ServiceConstant.SCHEMA+".BPM_SERVICE_JOB sv_inner left join  "+
 									" "+ServiceConstant.SCHEMA+".BPM_CALL_CENTER call_center_inner on sv_inner.bcc_no=call_center_inner.bcc_no   "+
 									" where    "+
 									" sv_inner.BSJ_CREATED_TIME between '"+start+" 00:00:00' and '"+end+" 23:59:59' "+
-									" and sv_inner.SBJ_DEPT_ID=5)   "+//-- as st_4
+									" and sv_inner.SBJ_DEPT_ID=3  and call_center_inner.BCC_IS_MA='1' )    "+//--  as st_2 
+									" union all  "+
+									" ( SELECT COUNT(*) FROM "+ServiceConstant.SCHEMA+".BPM_SERVICE_JOB sv_inner left join  "+
+									" "+ServiceConstant.SCHEMA+".BPM_CALL_CENTER call_center_inner on sv_inner.bcc_no=call_center_inner.bcc_no   "+
+									" where    "+
+									" sv_inner.BSJ_CREATED_TIME between '"+start+" 00:00:00' and '"+end+" 23:59:59' "+
+									" and sv_inner.SBJ_DEPT_ID=3  and call_center_inner.BCC_IS_MA='2' )    "+//--  as st_2_2 
+									" union all  "+
+									" ( SELECT COUNT(*) FROM "+ServiceConstant.SCHEMA+".BPM_SERVICE_JOB sv_inner left join  "+
+									" "+ServiceConstant.SCHEMA+".BPM_CALL_CENTER call_center_inner on sv_inner.bcc_no=call_center_inner.bcc_no   "+
+									" where    "+
+									" sv_inner.BSJ_CREATED_TIME between '"+start+" 00:00:00' and '"+end+" 23:59:59' "+
+									" and sv_inner.SBJ_DEPT_ID=3  and call_center_inner.BCC_IS_MA='0' )    "+//--  as st_2_3 
+									" union all  "+
+									" ( SELECT COUNT(*) FROM "+ServiceConstant.SCHEMA+".BPM_SERVICE_JOB sv_inner left join  "+
+									" "+ServiceConstant.SCHEMA+".BPM_CALL_CENTER call_center_inner on sv_inner.bcc_no=call_center_inner.bcc_no   "+
+									" where    "+
+									" sv_inner.BSJ_CREATED_TIME between '"+start+" 00:00:00' and '"+end+" 23:59:59' "+
+									" and sv_inner.SBJ_DEPT_ID=4  and call_center_inner.BCC_IS_MA='1' )    "+//-- as st_3
+									" union all  "+
+									" ( SELECT COUNT(*) FROM "+ServiceConstant.SCHEMA+".BPM_SERVICE_JOB sv_inner left join  "+
+									" "+ServiceConstant.SCHEMA+".BPM_CALL_CENTER call_center_inner on sv_inner.bcc_no=call_center_inner.bcc_no   "+
+									" where    "+
+									" sv_inner.BSJ_CREATED_TIME between '"+start+" 00:00:00' and '"+end+" 23:59:59' "+
+									" and sv_inner.SBJ_DEPT_ID=4  and call_center_inner.BCC_IS_MA='2' )    "+//-- as st_3_2
+									" union all  "+
+									" ( SELECT COUNT(*) FROM "+ServiceConstant.SCHEMA+".BPM_SERVICE_JOB sv_inner left join  "+
+									" "+ServiceConstant.SCHEMA+".BPM_CALL_CENTER call_center_inner on sv_inner.bcc_no=call_center_inner.bcc_no   "+
+									" where    "+
+									" sv_inner.BSJ_CREATED_TIME between '"+start+" 00:00:00' and '"+end+" 23:59:59' "+
+									" and sv_inner.SBJ_DEPT_ID=4  and call_center_inner.BCC_IS_MA='0' )    "+//-- as st_3_3
+									" union all  "+
+									" ( SELECT COUNT(*) FROM "+ServiceConstant.SCHEMA+".BPM_SERVICE_JOB sv_inner left join  "+
+									" "+ServiceConstant.SCHEMA+".BPM_CALL_CENTER call_center_inner on sv_inner.bcc_no=call_center_inner.bcc_no   "+
+									" where    "+
+									" sv_inner.BSJ_CREATED_TIME between '"+start+" 00:00:00' and '"+end+" 23:59:59' "+
+									" and sv_inner.SBJ_DEPT_ID=5 and call_center_inner.BCC_IS_MA='1' )   "+//-- as st_4
+									" union all  "+
+									" ( SELECT COUNT(*) FROM "+ServiceConstant.SCHEMA+".BPM_SERVICE_JOB sv_inner left join  "+
+									" "+ServiceConstant.SCHEMA+".BPM_CALL_CENTER call_center_inner on sv_inner.bcc_no=call_center_inner.bcc_no   "+
+									" where    "+
+									" sv_inner.BSJ_CREATED_TIME between '"+start+" 00:00:00' and '"+end+" 23:59:59' "+
+									" and sv_inner.SBJ_DEPT_ID=5 and call_center_inner.BCC_IS_MA='2' )   "+//-- as st_4_2
+									" union all  "+
+									" ( SELECT COUNT(*) FROM "+ServiceConstant.SCHEMA+".BPM_SERVICE_JOB sv_inner left join  "+
+									" "+ServiceConstant.SCHEMA+".BPM_CALL_CENTER call_center_inner on sv_inner.bcc_no=call_center_inner.bcc_no   "+
+									" where    "+
+									" sv_inner.BSJ_CREATED_TIME between '"+start+" 00:00:00' and '"+end+" 23:59:59' "+
+									" and sv_inner.SBJ_DEPT_ID=5 and call_center_inner.BCC_IS_MA='0' )   "+//-- as st_4_3
 									" union all  "+
 									" ( SELECT COUNT(*) FROM "+ServiceConstant.SCHEMA+".BPM_SERVICE_JOB sv_inner left join  "+
 									" "+ServiceConstant.SCHEMA+".BPM_CALL_CENTER call_center_inner on sv_inner.bcc_no=call_center_inner.bcc_no   "+
 									" where    "+
 									" sv_inner.BSJ_CREATED_TIME   between '"+start+" 00:00:00' and '"+end+" 23:59:59' "+
-									" and sv_inner.SBJ_DEPT_ID=1)   "+//-- as st_5 
+									" and sv_inner.SBJ_DEPT_ID=1 and call_center_inner.BCC_IS_MA='1' )   "+//-- as st_5 
+									" union all  "+
+									" ( SELECT COUNT(*) FROM "+ServiceConstant.SCHEMA+".BPM_SERVICE_JOB sv_inner left join  "+
+									" "+ServiceConstant.SCHEMA+".BPM_CALL_CENTER call_center_inner on sv_inner.bcc_no=call_center_inner.bcc_no   "+
+									" where    "+
+									" sv_inner.BSJ_CREATED_TIME   between '"+start+" 00:00:00' and '"+end+" 23:59:59' "+
+									" and sv_inner.SBJ_DEPT_ID=1 and call_center_inner.BCC_IS_MA='2' )   "+//-- as st_5_2 
+									" union all  "+
+									" ( SELECT COUNT(*) FROM "+ServiceConstant.SCHEMA+".BPM_SERVICE_JOB sv_inner left join  "+
+									" "+ServiceConstant.SCHEMA+".BPM_CALL_CENTER call_center_inner on sv_inner.bcc_no=call_center_inner.bcc_no   "+
+									" where    "+
+									" sv_inner.BSJ_CREATED_TIME   between '"+start+" 00:00:00' and '"+end+" 23:59:59' "+
+									" and sv_inner.SBJ_DEPT_ID=1 and call_center_inner.BCC_IS_MA='0' )   "+//-- as st_5_3 
 									" union all  "+
 									" ( SELECT COUNT(*) FROM "+ServiceConstant.SCHEMA+".BPM_SERVICE_JOB sv_inner left join  "+
 									" "+ServiceConstant.SCHEMA+".BPM_CALL_CENTER call_center_inner on sv_inner.bcc_no=call_center_inner.bcc_no   "+
@@ -617,7 +678,10 @@ public class PstObjectResource extends BaseResource {
 									" "+ServiceConstant.SCHEMA+".BPM_CALL_CENTER call_center_inner on sv_inner.bcc_no=call_center_inner.bcc_no   "+
 									" where    "+ 
 									" sv_inner.BSJ_CREATED_TIME  between '"+start+" 00:00:00' and '"+end+" 23:59:59' "+
-									" and sv_inner.SBJ_JOB_STATUS!=7  "+
+									" and (sv_inner.SBJ_JOB_STATUS=2 or   sv_inner.SBJ_JOB_STATUS=3 or sv_inner.SBJ_JOB_STATUS=6 "+
+                                    " or sv_inner.SBJ_DEPT_ID=1 or sv_inner.SBJ_DEPT_ID=2 or sv_inner.SBJ_DEPT_ID=3 "+
+                                    " or sv_inner.SBJ_DEPT_ID=4 or sv_inner.SBJ_DEPT_ID=5) "+ 
+									//" and sv_inner.SBJ_JOB_STATUS!=7  "+
 									" )  ";// --  as job_not_commplete
 									
 									 
@@ -625,10 +689,10 @@ public class PstObjectResource extends BaseResource {
 							 
 					         List<Object> so_list= vresultMessage.getResultListObj();
 					         int so_size=so_list.size(); 
-					         Object[] so_result=new Object[13];
+					         Object[] so_result=new Object[23];
 					         String[] day_start_show=start.split("-");
 					         String[] day_end_show=end.split("-");
-					         so_result[12]=start+"_"+end;
+					         so_result[22]=start+"_"+end;
 					         if(isMonth){
 					        	 so_result[0]=day_start_show[2]+" - "+day_end_show[2]+" ["+day_start_show[1]+"/"+day_start_show[0]+"]";
 					         }else{
@@ -865,68 +929,91 @@ public class PstObjectResource extends BaseResource {
 							String start_date=xbpsTerm.getQuery()[0];
 							String end_date=xbpsTerm.getQuery()[1];
 							String viewBy=xbpsTerm.getQuery()[2];
-							String viewBy_where="";
-							List<Object[]> ka_list_return=null;
-							List<Object[]> viewBy_list=null; 
-							
-							String query_list="SELECT call_center.BCC_NO as BCC_NO, "+//1
-						 			"IFNULL(call_center.BCC_ADDR1 ,'') as BRANCH, "+//2
-						 			"IFNULL(call_center.BCC_PROVINCE ,'') as PROVINCE, "+//3
-						 			"CONCAT(IFNULL(call_center.BCC_ADDR1 ,''),' ', "+
-						 			"IFNULL(call_center.BCC_ADDR2 ,''),' ',IFNULL(call_center.BCC_ADDR3 ,'') , ' ' ,IFNULL(call_center.BCC_PROVINCE ,''),' ',IFNULL(call_center.BCC_ZIPCODE ,'')) as ADDRESS , "+//4
-						 			"IFNULL(call_center.BCC_SERIAL,'') as BCC_SERIAL, "+//5
-						 			"IFNULL(call_center.BCC_MODEL,'') as BCC_MODEL, "+//6
-						 			"IFNULL(call_center.BCC_CAUSE,'') as BCC_CAUSE, "+//7
-						 			"IFNULL(sp.SPARES,'') as SPARES, "+//8
-						 			"IFNULL(job_status.BJS_STATUS,'')  as JOB_STATUS ,	"+//9
-						 			"IFNULL(service_job.SBJ_PROBLEM_CAUSE,'') as PROBLEM_CAUSE, "+//10
-						 			"IFNULL(service_job.SBJ_JOB_PROBLEM_SOLUTION,'') as PROBLEM_SOLUTION, "+//11
-						 			"CONCAT(IFNULL(user.firstname,''),' ',IFNULL(user.lastname,'')) AS OWNER, "+//12
-						 			"IFNULL(dept.BDEPT_DETAIL,'') as DEPT_NAME, "+//13
-						 			"IFNULL(DATE_FORMAT(call_center.BCC_CREATED_TIME,'%d/%m/%Y'),'') as CREATE_DATE, "+//14
-						 			"IFNULL(DATE_FORMAT(call_center.BCC_DUE_DATE,'%d/%m/%Y'),'Pending') as SLA_Date, "+//15
-						 			"CASE "+
-						 				"WHEN call_center.BCC_DUE_DATE IS NOT NULL "+
-						 			"THEN 'Complete' "+
-						 			"ELSE '' "+
-						 			"END  as PLAN_CLOSE, "+//16
-						 			"DATEDIFF(IFNULL(call_center.BCC_DUE_DATE,now()),call_center.BCC_CREATED_TIME) as Aging_SLA, "+//17
-						 			"IFNULL(TIMESTAMPDIFF(day, call_center.BCC_CREATED_TIME,now()),'') as Aging_Job "+//18
-			    
-									"FROM SYNDOME_BPM_DB.BPM_TO_DO_LIST todo "+
-									"left join SYNDOME_BPM_DB.BPM_SYSTEM_PARAM param "+ 
-										"on (param.param_name='FLOW_NAME' and param.`key`=todo.btdl_type) "+
-									"left join SYNDOME_BPM_DB.BPM_CALL_CENTER call_center "+
-										"on (todo.BTDL_REF=call_center.BCC_NO) "+
-									"left join SYNDOME_BPM_DB.BPM_SERVICE_JOB service_job "+
-										"on (call_center.BCC_NO=service_job.BCC_NO)   "+
-									"left join SYNDOME_BPM_DB.BPM_JOB_STATUS job_status "+
-										"on (job_status.BJS_ID=service_job.SBJ_JOB_STATUS and job_status.BJS_TYPE=2)   "+
-									"left join SYNDOME_BPM_DB.BPM_SYSTEM_PARAM param2 "+
-										"on (param2.param_name='STATE' and param2.`key`=todo.BTDL_STATE) "+
-									"left join ( "+
-										"SELECT mapping.BCC_NO,GROUP_CONCAT(IFNULL(product.IMA_ItemName,'') separator ',') AS SPARES "+
-										"FROM SYNDOME_BPM_DB.BPM_SERVICE_ITEM_MAPPING  mapping "+
-										"left join SYNDOME_BPM_DB.BPM_PRODUCT product "+
-											"on mapping.IMA_ItemID=product.IMA_ItemID  and mapping.BSIM_TYPE=2 "+
-										"GROUP BY mapping.BCC_NO) sp "+
-										"on sp.BCC_NO =call_center.BCC_NO "+ 
-									"left join SYNDOME_BPM_DB.user user "+
-										"on user.username = todo.BTDL_OWNER "+
+							String jobType=xbpsTerm.getQuery()[3];
+							String query = "";
+							String querySelect="SELECT call_center.BCC_NO as BCC_NO, "+//1
+									"IFNULL(call_center.BCC_ADDR1 ,'') as BRANCH, "+//2
+									"IFNULL(call_center.BCC_PROVINCE ,'') as PROVINCE, "+//3
+									"CONCAT(IFNULL(call_center.BCC_ADDR1 ,''),' ', IFNULL(call_center.BCC_ADDR2 ,''),' ',IFNULL(call_center.BCC_ADDR3 ,'') , ' ' ,IFNULL(call_center.BCC_PROVINCE ,''),' ',IFNULL(call_center.BCC_ZIPCODE ,'')) as ADDRESS , "+//4
+									"IFNULL(call_center.BCC_SERIAL,'') as BCC_SERIAL, "+//5
+									"IFNULL(call_center.BCC_MODEL,'') as BCC_MODEL, "+//6
+									"IFNULL(call_center.BCC_CAUSE,'') as BCC_CAUSE, "+//7
+									"IFNULL(sp.SPARES,'') as SPARES, "+//8
+									"IFNULL(sv.SBJ_JOB_PROBLEM_SOLUTION,'') as PROBLEM_SOLUTION, "+//9
+									"IFNULL(user.firstname,'') AS OWNER,"+//10
+									"IFNULL(dept.BDEPT_DETAIL,IFNULL(dept2.BDEPT_DETAIL,'')) as DEPT_NAME, "+//11
+									"IFNULL(DATE_FORMAT(call_center.BCC_CREATED_TIME,'%d/%m/%Y'),'') as CREATE_DATE, "+//12
+									"DATE_FORMAT((call_center.BCC_CREATED_TIME + INTERVAL IFNULL(call_center.BCC_SLA,0) HOUR),'%d/%m/%Y') as PLAN_SLA_DATE,"+//13
+									"IFNULL(DATE_FORMAT(sv.SBJ_SYNDOME_RECIPIENT_DATE,'%d/%m/%Y'),'Pending') as SLA_Date, "+//14
+									"CASE WHEN sv.SBJ_SYNDOME_RECIPIENT_DATE IS NOT NULL THEN 'Complete' "+
+									"ELSE 'Pending' END  as SLA_STATUS, "+//15
+									"IFNULL(j_status.BJS_DETAIL,'')  as JOB_STATUS , "+//16
+									"IFNULL(sv.SBJ_PROBLEM_CAUSE,'') as PROBLEM_CAUSE, "+//17
+									"DATEDIFF(IFNULL(sv.SBJ_SYNDOME_RECIPIENT_DATE,''),(call_center.BCC_CREATED_TIME + INTERVAL IFNULL(call_center.BCC_SLA,0) HOUR)) as Aging_PLAN, "+//18
+									"DATEDIFF(IFNULL(sv.SBJ_SYNDOME_RECIPIENT_DATE,''),call_center.BCC_CREATED_TIME) as Aging_SLA, "+//19
+									"DATEDIFF(IFNULL(sv.SBJ_CLOSE_DATE,now()), call_center.BCC_CREATED_TIME) as Aging_Job, "+//20
+									"call_center.BCC_CUST_INDEX, "+//21
+									"call_center.BCC_IS_MA, "+//22
+				 					"IFNULL(call_center.BCC_MA_NO,'') as BCC_MA_NO, "+//23
+				 					"IFNULL(call_center.BCC_REMARK,'') as BCC_REMARK "+//24
+									
+									"FROM SYNDOME_BPM_DB.BPM_CALL_CENTER call_center "+
+									"left join SYNDOME_BPM_DB.BPM_SERVICE_JOB  sv  "+
+									"on( call_center.BCC_NO=sv.BCC_NO) "+
+									"left join  SYNDOME_BPM_DB.BPM_JOB_STATUS j_status "+
+									"on (sv.SBJ_JOB_STATUS=j_status.BJS_ID and j_status.BJS_TYPE=2 ) "+
+									"left join (select todo.btdl_ref,todo.BTDL_STATE,todo.BTDL_OWNER ,todo.BTLD_AI,todo.BTDL_HIDE "+
+									"		 from SYNDOME_BPM_DB.BPM_TO_DO_LIST todo "+
+									"		 where todo.btdl_type='2' and "+
+									"		 todo.BTLD_AI in (SELECT MAX(BTLD_AI) from SYNDOME_BPM_DB.BPM_TO_DO_LIST where BTDL_TYPE=2 group by BTDL_REF)) as todo2 "+
+									"on (todo2.btdl_ref=call_center.BCC_NO) "+
+									"left join SYNDOME_BPM_DB.user user  "+
+									"on (user.username=todo2.BTDL_OWNER ) "+
 									"left join SYNDOME_BPM_DB.BPM_DEPARTMENT_USER dept_user "+
-										"on dept_user.USER_ID = user.id "+
+									"on dept_user.USER_ID = user.id "+
 									"left join SYNDOME_BPM_DB.BPM_DEPARTMENT dept "+
-										"on dept.BDEPT_ID = dept_user.BDEPT_ID "+
-			    
-									//"where "+
-									"where todo.BTDL_HIDE='1' "+
-										"and todo.BTDL_TYPE='2' "+
-										"and call_center.BCC_LOCATION like N'%"+viewBy+"%' "+
-										//" call_center.BCC_LOCATION like N'%ATM%' ";
-										"and call_center.BCC_CREATED_TIME "+
-										" between '"+start_date+" 00:00:00' and '"+end_date+" 23:59:59'     ";		
+									"on dept.BDEPT_ID = dept_user.BDEPT_ID  "+
+									"left join SYNDOME_BPM_DB.BPM_DEPARTMENT dept2 	"+
+									"on dept2.BDEPT_HDO_USER_ID = user.id "+
+									"left join  SYNDOME_BPM_DB.BPM_SYSTEM_PARAM param "+
+									"on ( param.PARAM_NAME='STATE' and todo2.BTDL_STATE=param.key ) "+
+									"left join ( SELECT mapping.BCC_NO,GROUP_CONCAT(IFNULL(product.IMA_ItemName,'') separator ',') AS SPARES "+
+									"	FROM SYNDOME_BPM_DB.BPM_SERVICE_ITEM_MAPPING  mapping left join SYNDOME_BPM_DB.BPM_PRODUCT product on mapping.IMA_ItemID=product.IMA_ItemID  and mapping.BSIM_TYPE=2 GROUP BY mapping.BCC_NO) sp "+
+									"    on sp.BCC_NO =call_center.BCC_NO ";
+							//String queryWhere = " where call_center.BCC_CUST_INDEX ='"+title+"' "+
+						 	String queryWhere = "";
+						 	if(jobType.equals("PENDING"))	{				
+								queryWhere = " where todo2.BTDL_HIDE='1' ";
+							}else{
+								queryWhere = " where call_center.BCC_CREATED_TIME BETWEEN '"+start_date+"  00:00:00' AND '"+end_date+"  23:59:59' ";
+							}
+							if(!viewBy.equals("ALL"))	
+								queryWhere = queryWhere+" and call_center.BCC_CUST_INDEX ='"+viewBy+"'  ";
+							else if(viewBy.equals("ALL"))	//
+								queryWhere = queryWhere+" and (call_center.BCC_CUST_INDEX='KTB' "+
+										" or call_center.BCC_CUST_INDEX='BAY' "+
+										" or call_center.BCC_CUST_INDEX='SCB' "+
+										" or call_center.BCC_CUST_INDEX='BBL' "+
+										" or call_center.BCC_CUST_INDEX='KBANK' "+
+										" or call_center.BCC_CUST_INDEX='LHBANK' "+
+										" or call_center.BCC_CUST_INDEX='UOB' "+
+										" or call_center.BCC_CUST_INDEX='GSB' "+
+										" or call_center.BCC_CUST_INDEX='BAAC' "+
+										" or call_center.BCC_CUST_INDEX='IBANK' "+
+										" or call_center.BCC_CUST_INDEX='KKBANK' "+
+										" or call_center.BCC_CUST_INDEX='TNC' "+
+										" or call_center.BCC_CUST_INDEX='GHBANK' "+
+										" or call_center.BCC_CUST_INDEX='CIMB' "+
+										" or call_center.BCC_CUST_INDEX='DLT' "+
+										" or call_center.BCC_CUST_INDEX='THAIPOST' "+
+										" or call_center.BCC_CUST_INDEX='BIGC') ";
+							//if(filterJob.equals("PENDING"))	{				
+							//	queryWhere = queryWhere+" and todo2.BTDL_HIDE='1' ";
+							//}
+							String queryOrderBy = " order by call_center.BCC_NO";
+							query = querySelect+queryWhere+queryOrderBy;	
 							
-							 vresultMessage= pstObjectService.searchObject(query_list);
+							 vresultMessage= pstObjectService.searchObject(query);
 							   
 							 
 							return getRepresentation(entity, vresultMessage, xstream);
@@ -1590,7 +1677,7 @@ public class PstObjectResource extends BaseResource {
 			    " IFNULL(call_center.BCC_ADDR3 ,'') as c20,"+
 			   // " IFNULL(call_center.BCC_LOCATION ,'') as c21,"+
 			   // "+data[i][21]+" "+data[i][18]+" "+data[i][19]+" "+data[i][20]+" "+data[i][22]+" "+data[i][23]+" "
-			   " CONCAT(IFNULL(call_center.BCC_LOCATION ,''),' ',IFNULL(call_center.BCC_ADDR1 ,''),' ',IFNULL(call_center.BCC_ADDR2 ,''),' ',IFNULL(call_center.BCC_ADDR3 ,'') , ' ' "+
+			   " CONCAT(IFNULL(call_center.BCC_LOCATION ,''),' ',IFNULL(call_center.BCC_BRANCH ,''),' ',IFNULL(call_center.BCC_ADDR1 ,''),' ',IFNULL(call_center.BCC_ADDR2 ,''),' ',IFNULL(call_center.BCC_ADDR3 ,'') , ' ' "+
 			   " 		,IFNULL(call_center.BCC_PROVINCE ,''),' ',IFNULL(call_center.BCC_ZIPCODE ,'')) as c21 , "+
 			    " IFNULL(call_center.BCC_PROVINCE ,'') as c22,"+
 			    " IFNULL(call_center.BCC_ZIPCODE ,'') as c23,"+
