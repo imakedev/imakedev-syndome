@@ -40,14 +40,9 @@ $(document).ready(function() {
 });
 
 function exportReport(){   
-	var dept = "";
-	<c:if test="${isVeiwReportPendingSCAccount}">
-		dept = "SC";
-	</c:if>
-	<c:if test="${isVeiwReportPendingITAccount}">
-		dept = "IT";
-	</c:if>
-	var src = "report/exportReportPending/"+dept;
+	var dept=$("#deptSelect").val();
+	var viewSelect=$("#viewSelect").val();
+	var src = "report/exportReportPending/"+dept+"/"+viewSelect;
 	var div = document.createElement("div");
 	document.body.appendChild(div);
 	div.innerHTML = "<iframe width='0' height='0' scrolling='no' frameborder='0' src='" + src + "'></iframe>";  
@@ -85,6 +80,22 @@ function exportReport(){
 									<a class="btn" style="margin-top: -10px;"
 									onclick="viewReport()">&nbsp;View&nbsp;</a>
 										</span>  -->
+										<span style="padding-left:20px"> 
+	 									 แผนก : 
+	 									 <select name="deptSelect" style="width:200px" id="deptSelect"> 
+	 									 	<option value="SC">SC</option>
+	 									 	<option value="IT">กทม และ ปริฯ</option>
+	 									 	<option value="REG">ภูมิภาค</option>
+	 									 </select>
+	 								  </span> 
+										<span style="padding-left:20px"> 
+	 									 แยกตามลูกค้า : 
+	 									 <select name="viewSelect" style="width:200px" id="viewSelect"> 
+	 									 	<option value="ALL">ALL</option>
+	 									 	<option value="0">นอกประกัน</option>
+	 									 	<option value="1">ในประกัน และ ในประกันMA</option>
+	 									 </select>
+	 								  </span> 
 										<span id="exportReport_element" style="padding-left: 10px;">
 										  
 									<a class="btn" style="margin-top: -10px;"
