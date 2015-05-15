@@ -325,7 +325,7 @@ function renderPageSelect(){
 									<span style="padding: 5px;">
 									<select style="width:150px" id="dep_select_id"> 
 										 <option value="sommai,1">ฝ่าย IT กทม ปริฯ</option> 
-										 <option value="siwaporn,1">ฝ่าย IT ภูมิภาค</option>
+										 <option value="parinya,1">ฝ่าย IT ภูมิภาค</option>
 										 <option value="maytazzawan,1">ฝ่ายขนส่ง กทม ปริฯ</option>
 										 <option value="regent_admin,1">ฝ่ายขนส่ง ภูมิภาค</option>
 										 <option value="numfon,1">ฝ่าย SC</option>
