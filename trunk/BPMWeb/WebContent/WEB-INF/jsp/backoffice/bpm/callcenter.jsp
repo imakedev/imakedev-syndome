@@ -282,60 +282,76 @@ function searchCallCenter(_page){
 		//" where so.BSO_CREATED_DATE between DATE_FORMAT(now(),'%Y-%m-%d 00:00:00') and DATE_FORMAT(now(),'%Y-%m-%d 23:59:59') ";
 	} */
 	var query=" SELECT "+
-	  " call_center.BCC_NO ,"+
-	  " IFNULL(call_center.BCC_SERIAL,'') ,"+
-	    " IFNULL(call_center.BCC_MODEL,'') ,"+
-	    " IFNULL(call_center.BCC_CAUSE,'') ,"+
-	    "  call_center.BCC_CREATED_TIME  ,"+
-	    //" IFNULL(DATE_FORMAT(call_center.BCC_CREATED_TIME,'%Y-%m-%d %H:%i:%s'),'') ,"+
-	    " IFNULL(DATE_FORMAT(call_center.BCC_CREATED_TIME,'%d/%m/%Y %H:%i'),'') ,"+
-	    " IFNULL(call_center.BCC_SLA,'') ,"+
-	    " IFNULL(call_center.BCC_IS_MA ,'') ,"+
-	    " IFNULL(call_center.BCC_MA_NO ,'') ,"+
-	    " IFNULL(call_center.BCC_MA_START ,'') ,"+
-	    " IFNULL(call_center.BCC_MA_END ,'') ,"+
-	    " IFNULL(call_center.BCC_STATUS ,'') ,"+
-	    " IFNULL(call_center.BCC_REMARK ,'') ,"+
-	    " IFNULL(call_center.BCC_USER_CREATED ,'') ,"+
-	    " IFNULL(call_center.BCC_DUE_DATE ,'') ,"+
-	    " IFNULL(call_center.BCC_CONTACT ,'') ,"+
-	    " IFNULL(call_center.BCC_TEL ,'') ,"+
-	    " IFNULL(call_center.BCC_CUSTOMER_NAME ,'') ,"+ //17
-	    " IFNULL(call_center.BCC_ADDR1 ,'') ,"+
-	    " IFNULL(call_center.BCC_ADDR2 ,'') ,"+
-	    " IFNULL(call_center.BCC_ADDR3 ,'') ,"+
-	    " IFNULL(call_center.BCC_LOCATION ,'') ,"+
-	    " IFNULL(call_center.BCC_PROVINCE ,'') ,"+
-	    " IFNULL(call_center.BCC_ZIPCODE ,'') ,"+
-	    " IFNULL(DATE_FORMAT(call_center.BCC_DUE_DATE,'%d/%m/%Y'),'') , "+
-	   // " IFNULL((select BTDL_STATE  FROM  "+SCHEMA_G+".BPM_TO_DO_LIST todo  "+
-	   " IFNULL((select ifnull(param.VALUE,'')   FROM  "+SCHEMA_G+".BPM_TO_DO_LIST todo  "+ 
-	   " left join  "+SCHEMA_G+".BPM_SYSTEM_PARAM param on ( param.PARAM_NAME='STATE' and todo.BTDL_STATE=param.key ) "+
-	  	"  where todo.btdl_ref=call_center.BCC_NO and todo.btdl_type='2' "+
+	    " call_center.BCC_NO ,"+//1
+	    " IFNULL(call_center.BCC_SERIAL,'') ,"+//2
+	    " IFNULL(call_center.BCC_MODEL,'') ,"+//3
+	    " IFNULL(call_center.BCC_CAUSE,'') ,"+//4
+	    "  call_center.BCC_CREATED_TIME  ,"+//5
+	    " IFNULL(DATE_FORMAT(call_center.BCC_CREATED_TIME,'%d/%m/%Y %H:%i'),'') ,"+//6
+	    " IFNULL(call_center.BCC_SLA,'') ,"+//7
+	    " IFNULL(call_center.BCC_IS_MA ,'') ,"+//8
+	    " IFNULL(call_center.BCC_MA_NO ,'') ,"+//9
+	    " IFNULL(call_center.BCC_MA_START ,'') ,"+//10
+	    " IFNULL(call_center.BCC_MA_END ,'') ,"+//11
+	    " IFNULL(call_center.BCC_STATUS ,'') ,"+//12
+	    " IFNULL(call_center.BCC_REMARK ,'') ,"+//13
+	    " IFNULL(call_center.BCC_USER_CREATED ,'') ,"+//14
+	    " IFNULL(call_center.BCC_DUE_DATE ,'') ,"+//15
+	    " IFNULL(call_center.BCC_CONTACT ,'') ,"+//16
+	    " IFNULL(call_center.BCC_TEL ,'') ,"+//17
+	    " IFNULL(call_center.BCC_CUSTOMER_NAME ,'') ,"+ //18
+	    " IFNULL(call_center.BCC_ADDR1 ,'') ,"+//19
+	    " IFNULL(call_center.BCC_ADDR2 ,'') ,"+//20
+	    " IFNULL(call_center.BCC_ADDR3 ,'') ,"+//21
+	    " IFNULL(call_center.BCC_LOCATION ,'') ,"+//22
+	    " IFNULL(call_center.BCC_PROVINCE ,'') ,"+//23
+	    " IFNULL(call_center.BCC_ZIPCODE ,'') ,"+//24
+	    " IFNULL(DATE_FORMAT(call_center.BCC_DUE_DATE,'%d/%m/%Y'),'') , "+ //25
+	    
+	  	//--------------Begin aui edit tunning query[11/03/2015]----------------	    
+	   /* " ifnull(param.VALUE,'') as param, "+
+	    " concat(ifnull(u.firstName,''),' ',ifnull(u.lastName,'')) as user_fullname,"+*/
+	    
+	    " IFNULL((select ifnull(param.VALUE,'')   FROM  "+SCHEMA_G+".BPM_TO_DO_LIST todo  "+ 
+	    " left join  "+SCHEMA_G+".BPM_SYSTEM_PARAM param on ( param.PARAM_NAME='STATE' and todo.BTDL_STATE=param.key ) "+
+	  	"  where todo.btdl_ref=call_center.BCC_NO and todo.btdl_type='2' "+	  	
+	  	" order by BTDL_CREATED_TIME desc limit 1 ) ,''), "+//26
 	  	
-	  	" order by BTDL_CREATED_TIME desc limit 1 ) ,''), "+
-	  	// " IFNULL((select BTDL_OWNER  FROM  "+SCHEMA_G+".BPM_TO_DO_LIST todo  "+
-	  	  " IFNULL((select concat(ifnull(u.firstName,''),' ',ifnull(u.lastName,''))  FROM  "+SCHEMA_G+".BPM_TO_DO_LIST todo  "+
-	  			
+	  	" IFNULL((select concat(ifnull(u.firstName,''),' ',ifnull(u.lastName,''))  FROM  "+SCHEMA_G+".BPM_TO_DO_LIST todo  "+	  			
 	     " left join  "+SCHEMA_G+".user u on "+
 		    " (u.username=todo.BTDL_OWNER ) "+
-		  	"  where todo.btdl_ref=call_center.BCC_NO and todo.btdl_type='2' order by BTDL_CREATED_TIME desc limit 1 ) ,''), "+
-		// " IFNULL(call_center.BCC_STATE ,'') ,  "+
-		"  ifnull(j_status.BJS_STATUS,'') ,"+
-	 	 " IFNULL(DATE_FORMAT(call_center.BCC_DUE_DATE_START,'%H:%i'),'') , "+
-	 	 " IFNULL(DATE_FORMAT(call_center.BCC_DUE_DATE_END,'%H:%i'),'')  "+ 
+		  	"  where todo.btdl_ref=call_center.BCC_NO and todo.btdl_type='2' order by BTDL_CREATED_TIME desc limit 1 ) ,''), "+//27
+		  	
+		//--------------Begin aui edit tunning query[11/03/2015]----------------	    
+		" IFNULL(j_status.BJS_STATUS,'') ,"+//28
+	 	" IFNULL(DATE_FORMAT(call_center.BCC_DUE_DATE_START,'%H:%i'),'') , "+//29
+	 	" IFNULL(DATE_FORMAT(call_center.BCC_DUE_DATE_END,'%H:%i'),'') , "+ //30
+	 	" IFNULL(call_center.BCC_BRANCH,'') "+//31
+	 	
 	    " FROM "+SCHEMA_G+".BPM_CALL_CENTER call_center left join "+ 
 	    " "+SCHEMA_G+".BPM_SERVICE_JOB  sv  on( call_center.BCC_NO=sv.BCC_NO) "+
 	    " left join  "+SCHEMA_G+".BPM_JOB_STATUS j_status on "+
-	    " (sv.SBJ_JOB_STATUS=j_status.BJS_ID and j_status.BJS_TYPE=2 ) "+ 
+	    " (sv.SBJ_JOB_STATUS=j_status.BJS_ID and j_status.BJS_TYPE=2 ) "+
+	    //--------------Begin aui add tunning query[11/03/2015]----------------	    
+		/*" left join (select todo.btdl_ref,todo.BTDL_STATE,todo.BTDL_OWNER ,todo.BTLD_AI "+
+		" from SYNDOME_BPM_DB.BPM_TO_DO_LIST todo "+
+		" where todo.btdl_type='2' and "+
+		" todo.BTLD_AI in (SELECT MAX(BTLD_AI) from SYNDOME_BPM_DB.BPM_TO_DO_LIST where BTDL_TYPE=2 group by BTDL_REF)) as todo2 "+
+		" on (todo2.btdl_ref=call_center.BCC_NO) "+
+		" left join SYNDOME_BPM_DB.user u  "+
+		" on (u.username=todo2.BTDL_OWNER ) "+
+		" left join  SYNDOME_BPM_DB.BPM_SYSTEM_PARAM param "+
+		" on ( param.PARAM_NAME='STATE' and todo2.BTDL_STATE=param.key ) "+*/
+		//--------------End aui add tunning query[11/03/2015]----------------	    
 	 
 				sqlWhere+
-	    "order by  call_center.BCC_CREATED_TIME desc ";
+	    "order by  call_center.BCC_NO desc ";
 	 
 	 // alert(query)
+	_perpageG = 50;
 	var limitRow=(_page>1)?((_page-1)*_perpageG):0; 
 	var queryObject="  "+query+"   limit "+limitRow+", "+_perpageG;
-	var queryCount=" select count(*) from (  "+query+" ) as x";
+	var queryCount=" select count(*) from (  "+query+" ) as x"; 
 	SynDomeBPMAjax.searchObject(queryObject,{
 		callback:function(data){
 			if(data.resultMessage.msgCode=='ok'){
@@ -379,13 +395,14 @@ function searchCallCenter(_page){
 				        "    	</td> "+
 				        "  	</tr>  "; */
 				     var BCC_STATE=data[i][27];
+				        var BCC_BRANCH="";
 				        if(BCC_STATE!='cancel')
 				        	BCC_STATE=data[i][25];
 				       str=str+ "  	<tr style=\"cursor: pointer;\">"+  
 						   "  		<td style=\"text-align: left;\"><span  style=\"text-decoration: underline;\"  onclick=\"loadDynamicPage('dispatcher/page/callcenter_job?bccNo="+data[i][0]+"&mode=edit')\">"+data[i][0]+"</span></td>"+     
 						   "  		<td style=\"text-align: left;\">"+data[i][1]+"/"+data[i][2]+"</td>"+    
 						   "  		<td style=\"text-align: left;\">"+data[i][3]+"</td>"+     
-					        "    	<td style=\"text-align: left;\">"+data[i][21]+" "+data[i][18]+" "+data[i][19]+" "+data[i][20]+" "+data[i][22]+" "+data[i][23]+" "+data[i][15]+" "+data[i][16]+"</td>  "+  
+					        "    	<td style=\"text-align: left;\">"+data[i][21]+" "+data[i][30]+" "+data[i][18]+" "+data[i][19]+" "+data[i][20]+" "+data[i][22]+" "+data[i][23]+" "+data[i][15]+" "+data[i][16]+"</td>  "+  
 					        "    	<td style=\"text-align: left;\">"+data[i][24]+" "+data[i][28]+"-"+data[i][29]+"</td>  "+
 					        "    	<td style=\"text-align: left;\">"+data[i][5]+" ["+data[i][13]+"]</td>  "+ 
 					        "    	<td style=\"text-align: left;\">"+data[i][26]+"</td>  "+ 
